@@ -1,7 +1,7 @@
 # Renderer: HTML Artifact
 
 **Purpose**: Convert any assembled content block into a rendered HTML artifact
-in the FigureFoundry editorial beige style.
+in the selected FigureFoundry palette.
 
 Use this renderer only when the user asks for editable HTML/SVG, deterministic labels,
 or a local vector artifact. Always read `style/visual_system.md` before executing this
@@ -33,23 +33,25 @@ In a local coding environment, save the same self-contained HTML to disk and rep
   /* === RESET & BASE === */
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  /* === TOKENS (from visual_system.md) === */
+  /* === TOKENS (default: sci-light palette from visual_system.md) === */
   :root {
-    --bg-primary:   #F4F1EC;
-    --bg-secondary: #EFEAE4;
-    --bg-panel:     #E8E3DC;
-    --text-primary: #111111;
-    --text-secondary: #4A4A4A;
-    --text-annotation: #7A7A7A;
-    --text-muted:   #AAAAAA;
-    --accent-cyan:  #73C8E0;
-    --accent-black: #000000;
-    --neutral-gray: #D9D3C7;
-    --neutral-dark: #B8B1A6;
-    --error-red:    #B91C1C;
-    --warning-amber: #D97706;
-    --success-green: #2D7A4F;
-    --border:       1px solid #D9D3C7;
+    --bg-primary:   #FFFFFF;
+    --bg-secondary: #FAFAF7;
+    --bg-panel:     #F7FAFC;
+    --text-primary: #1F2933;
+    --text-secondary: #5B6770;
+    --text-annotation: #7A8690;
+    --text-muted:   #A7B0B7;
+    --core-dark:    #24313A;
+    --accent-main:  #2AA7C8;
+    --accent-soft:  #E8F4FA;
+    --novelty-soft: #DFF3EA;
+    --novelty-strong: #2F8F6B;
+    --neutral-gray: #CBD5DC;
+    --neutral-dark: #9AA6AF;
+    --error-red:    #D96C5F;
+    --warning-amber: #F2B84B;
+    --border:       1px solid #CBD5DC;
     --radius:       3px;
     --shadow:       0 1px 4px rgba(0,0,0,0.06);
   }
@@ -89,7 +91,7 @@ In a local coding environment, save the same self-contained HTML to disk and rep
     font-size: 10px; color: var(--text-annotation); letter-spacing: 0.02em;
   }
   .header-right {
-    border-left: 2px solid var(--accent-cyan);
+    border-left: 2px solid var(--accent-main);
     padding-left: 14px;
   }
   .header-right .question-label {
@@ -101,7 +103,7 @@ In a local coding environment, save the same self-contained HTML to disk and rep
   }
   .header-right .answer-label {
     font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
-    color: var(--accent-cyan); text-transform: uppercase; margin-bottom: 4px;
+    color: var(--accent-main); text-transform: uppercase; margin-bottom: 4px;
   }
   .header-right .answer {
     font-size: 12px; font-weight: 700; color: var(--text-primary); line-height: 1.35;
@@ -141,7 +143,8 @@ In a local coding environment, save the same self-contained HTML to disk and rep
     font-size: 52px; font-weight: 800; line-height: 1;
     color: var(--text-primary); margin-bottom: 4px;
   }
-  .stat-number.cyan { color: var(--accent-cyan); }
+  .stat-number.accent { color: var(--accent-main); }
+  .stat-number.cyan { color: var(--accent-main); }
   .stat-label {
     font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--text-secondary); margin-bottom: 2px;
@@ -166,15 +169,16 @@ In a local coding environment, save the same self-contained HTML to disk and rep
 
   /* === DIAGRAM SVG ELEMENTS (inline styles for SVG) === */
   /* Use these classes in inline SVG */
-  .node-primary    { fill: #111111; stroke: none; rx: 4; }
-  .node-secondary  { fill: #F4F1EC; stroke: #D9D3C7; stroke-width: 1; rx: 4; }
-  .node-highlight  { fill: #73C8E0; stroke: none; rx: 4; }
-  .node-external   { fill: #F4F1EC; stroke: #B8B1A6; stroke-width: 1; stroke-dasharray: 4,2; rx: 4; }
-  .node-data       { fill: #D9D3C7; stroke: none; rx: 3; }
-  .edge-primary    { stroke: #4A4A4A; stroke-width: 1.5; fill: none; }
-  .edge-highlight  { stroke: #73C8E0; stroke-width: 2; fill: none; }
-  .edge-feedback   { stroke: #73C8E0; stroke-width: 1.5; stroke-dasharray: 5,3; fill: none; }
-  .edge-error      { stroke: #B91C1C; stroke-width: 1.5; fill: none; }
+  .node-primary    { fill: #24313A; stroke: none; rx: 4; }
+  .node-secondary  { fill: #FFFFFF; stroke: #CBD5DC; stroke-width: 1; rx: 4; }
+  .node-highlight  { fill: #E8F4FA; stroke: #2AA7C8; stroke-width: 1.2; rx: 4; }
+  .node-novelty    { fill: #DFF3EA; stroke: #2F8F6B; stroke-width: 1.2; rx: 4; }
+  .node-external   { fill: #F7FAFC; stroke: #9AA6AF; stroke-width: 1; stroke-dasharray: 4,2; rx: 4; }
+  .node-data       { fill: #F7FAFC; stroke: #CBD5DC; stroke-width: 1; rx: 3; }
+  .edge-primary    { stroke: #5B6770; stroke-width: 1.5; fill: none; }
+  .edge-highlight  { stroke: #2AA7C8; stroke-width: 2; fill: none; }
+  .edge-feedback   { stroke: #2AA7C8; stroke-width: 1.5; stroke-dasharray: 5,3; fill: none; }
+  .edge-error      { stroke: #D96C5F; stroke-width: 1.5; fill: none; }
   .text-node-dark  { fill: white; font-size: 11px; font-weight: 600; text-anchor: middle; }
   .text-node-light { fill: #111111; font-size: 11px; font-weight: 600; text-anchor: middle; }
   .text-edge-label { fill: #7A7A7A; font-size: 9px; text-anchor: middle; }
@@ -201,7 +205,7 @@ In a local coding environment, save the same self-contained HTML to disk and rep
   .bar-track { flex: 1; height: 14px; background: var(--bg-primary);
                border-radius: 2px; overflow: hidden; position: relative; }
   .bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
-  .bar-fill.primary { background: var(--accent-cyan); }
+  .bar-fill.primary { background: var(--accent-main); }
   .bar-fill.secondary { background: var(--text-primary); }
   .bar-fill.neutral { background: var(--neutral-dark); }
   .bar-fill.error { background: var(--error-red); }
@@ -215,7 +219,7 @@ In a local coding environment, save the same self-contained HTML to disk and rep
     font-size: 11px; color: var(--text-secondary); line-height: 1.4;
   }
   .bullet-list li::before {
-    content: '—'; color: var(--accent-cyan); font-weight: 700;
+    content: '—'; color: var(--accent-main); font-weight: 700;
     flex-shrink: 0; margin-top: 0;
   }
 
@@ -226,8 +230,10 @@ In a local coding environment, save the same self-contained HTML to disk and rep
     border-radius: 2px; font-size: 9px; font-weight: 600;
     letter-spacing: 0.06em; color: var(--text-secondary);
   }
-  .tag.cyan { background: var(--accent-cyan); color: white; border-color: var(--accent-cyan); }
-  .tag.dark { background: var(--text-primary); color: white; border-color: var(--text-primary); }
+  .tag.accent { background: var(--accent-soft); color: var(--text-primary); border-color: var(--accent-main); }
+  .tag.cyan { background: var(--accent-soft); color: var(--text-primary); border-color: var(--accent-main); }
+  .tag.dark { background: var(--core-dark); color: white; border-color: var(--core-dark); }
+  .tag.novelty { background: var(--novelty-soft); color: var(--text-primary); border-color: var(--novelty-strong); }
 
   /* === PANEL / CARD === */
   .panel {
@@ -244,7 +250,7 @@ In a local coding environment, save the same self-contained HTML to disk and rep
 
   /* === CALLOUT === */
   .callout {
-    border-left: 3px solid var(--accent-cyan);
+    border-left: 3px solid var(--accent-main);
     padding: 10px 14px;
     background: var(--bg-secondary);
     border-radius: 0 var(--radius) var(--radius) 0;
@@ -273,7 +279,7 @@ In a local coding environment, save the same self-contained HTML to disk and rep
   @media (max-width: 820px) {
     body { width: 100%; padding: 24px 18px 32px; }
     .header { grid-template-columns: 1fr; gap: 16px; }
-    .header-right { border-left: 0; border-top: 2px solid var(--accent-cyan); padding-left: 0; padding-top: 12px; }
+    .header-right { border-left: 0; border-top: 2px solid var(--accent-main); padding-left: 0; padding-top: 12px; }
     .grid-2, .grid-3, .grid-1-2, .grid-2-1 { grid-template-columns: 1fr; }
     .stat-number { font-size: 44px; }
     .bar-label { width: 96px; }
@@ -300,6 +306,9 @@ Do not use Google Fonts, remote images, remote scripts, Chart.js, D3, or CDN ass
 Never use canvas or third-party charting libraries for diagrams.
 Draw all architecture diagrams as hand-crafted inline SVG using the node/edge classes above.
 Every SVG with arrows must define arrowhead markers in `<defs>` and use `marker-end`.
+Use `.node-primary` only for the single central orchestrator or core claim. Use
+`.node-secondary` for normal deterministic modules and `.node-novelty` for evidence,
+bundle, provenance, or validated output artifacts.
 
 ### Rule 3: Charts as CSS + SVG Hybrid
 - Horizontal bar charts: use the `.bar-chart` CSS classes
@@ -357,7 +366,9 @@ Footer must identify assumptions because no source artifact exists.
 
 Before outputting the HTML artifact, verify:
 
-- [ ] Background is `#F4F1EC` (not white)
+- [ ] Background matches the selected palette and remains publication-clean
+- [ ] Palette matches the selected profile from `style/visual_system.md`
+- [ ] Large pure-black filled boxes are avoided; dark fill is limited to one central anchor
 - [ ] Section headers are UPPERCASE with letter-spacing
 - [ ] At least one dominant stat number (48px+) is present
 - [ ] Diagram is drawn as inline SVG (not described, not placeholder)

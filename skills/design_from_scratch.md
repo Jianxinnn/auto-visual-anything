@@ -124,10 +124,10 @@ GROUPINGS:
   [stages / layers / service boundaries]
 
 HIGHLIGHTED PATH:
-  [the most critical / novel path — colored cyan]
+  [the most critical / novel path — selected main-path accent]
 
 SECONDARY PATHS:
-  [normal operational paths — colored black/gray]
+  [normal operational paths — neutral gray/slate]
 
 SPECIAL ELEMENTS:
   [loops, decisions, feedback arrows]

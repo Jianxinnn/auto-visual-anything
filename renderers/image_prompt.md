@@ -17,6 +17,7 @@ Input: A structured content block from any sub-skill, with:
 - `assumptions`: visual or design assumptions
 - `unknowns`: important missing details
 - `nodes`, `edges`, `panels`, `labels`, `callouts`, and `visual_hierarchy`
+- `palette_profile` and `palette_rationale`
 
 Output: A copy-ready prompt package, not an image.
 
@@ -49,7 +50,14 @@ Avoid rendering as tiny text:
 - [...]
 
 ## 5. Style Direction
-[Vector style, palette, typography, line weight, icon rules, whitespace, what should feel premium.]
+Palette profile:
+[sci-light / bio-evidence / systems-blue / data-violet / security-amber / product-muted / custom]
+
+Palette rationale:
+[Why this palette fits the project/source and what each color means.]
+
+Visual style:
+[Vector style, typography, line weight, icon rules, whitespace, what should feel premium.]
 
 ## 6. Negative Prompt
 [What to avoid: visual cliches, inaccurate elements, clutter, bad typography, cartoons, etc.]
@@ -136,6 +144,37 @@ Avoid:
 - photorealistic wet-lab scenes unless requested
 - excessive gradients or 3D effects
 
+### Select Palette Semantically
+
+Choose a palette from `style/visual_system.md` based on the source domain and the figure's
+main claim. Do not default to black/cyan for every project.
+
+Common choices:
+
+- `sci-light`: general scientific software, algorithms, repo architecture.
+- `bio-evidence`: biology, protein design, wet-lab, evidence/provenance workflows.
+- `systems-blue`: infrastructure, developer tools, pipelines, agents.
+- `data-violet`: analytics, evaluation, benchmarks, knowledge graphs.
+- `security-amber`: verification, safety, compliance, threat/risk models.
+- `product-muted`: product/system explainers that need a polished but restrained look.
+
+Every prompt must specify color semantics:
+
+```text
+Use [palette] because [rationale].
+Use dark slate only for the single central orchestrator, if needed.
+Use light boxes for normal deterministic modules.
+Use [accent] for the main path.
+Use [novelty color] for the output/evidence/provenance claim.
+Use gray dashed outlines for optional/external elements.
+Use amber/coral only for warnings, failed gates, blockers, or negative evidence.
+Avoid large pure-black filled boxes.
+```
+
+If the project's novelty is an output contract, evidence graph, provenance ledger, or
+auditable artifact, give that element a distinct pale semantic fill so the novelty is
+visible even when the core execution path is not selected.
+
 ### Tool-Agnostic Prompting
 
 The core prompt should work in GPT image, Midjourney, Ideogram, or Stable Diffusion-like
@@ -168,6 +207,7 @@ Before returning the prompt package, verify:
 
 - [ ] The core prompt has one clear scientific message.
 - [ ] The layout is spatially specific enough to guide generation.
+- [ ] The style direction names a palette profile and explains color semantics.
 - [ ] High-priority labels are few enough to be legible.
 - [ ] The negative prompt removes common scientific-figure failure modes.
 - [ ] Exact source facts are not mixed with assumptions.

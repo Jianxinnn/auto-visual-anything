@@ -52,9 +52,9 @@ FigureFoundry/
 ## Visual Style
 
 All outputs follow the **FigureFoundry editorial style**:
-- Warm beige background (`#F4F1EC`)
-- Strong typographic hierarchy (large numbers dominate)
-- Soft cyan accent (`#73C8E0`) for highlights
+- Domain-aware scientific palettes selected from the source and figure claim
+- Strong typographic hierarchy (large numbers dominate when useful)
+- A single restrained accent for the primary path or main claim
 - Corporate research report aesthetic (McKinsey × editorial data journalism)
 - Inline SVG diagrams with consistent node/edge visual language
 - A1 portrait proportions (800 × 1100px+ HTML)

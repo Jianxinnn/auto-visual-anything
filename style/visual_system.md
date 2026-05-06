@@ -13,9 +13,10 @@ This is NOT:
 - Decorative infographic
 
 This IS:
-> A clean, beige, corporate research report style with strong data storytelling,
-> structured narrative sections, and clear visual hierarchy.
-> Think: McKinsey report × Deloitte insight × editorial data journalism.
+> A clean scientific figure system with strong data storytelling, structured narrative
+> sections, and clear visual hierarchy.
+> Think: Nature Computational Science / Nature Machine Intelligence figure discipline,
+> with enough editorial polish for technical reports.
 
 The output must feel intentionally designed, not like a generic flowchart. Use scale,
 alignment, white space, and a strong central diagram to create a premium technical poster.
@@ -37,38 +38,46 @@ arrows. If a diagram has more than 14 nodes, group nodes into stages or layers f
 
 ---
 
-## COLOR SYSTEM
+## PALETTE SYSTEM
 
-### Background
-- **Primary**: `#F4F1EC` (warm beige — main canvas)
-- **Secondary**: `#EFEAE4` (slightly deeper beige — alternate sections)
-- **Panel**: `#E8E3DC` (card/block backgrounds)
+FigureFoundry does not use one fixed color scheme for every project. Select a palette
+based on the source domain and the figure's main claim, then state the palette rationale
+in the prompt package.
 
-### Text
-- **#111111** — primary text (titles, key numbers, headers)
-- **#4A4A4A** — secondary text (body, descriptions)
-- **#7A7A7A** — annotations, labels, captions
-- **#AAAAAA** — disabled / background annotations
+### Palette Selector
 
-### Accent Colors (STRICT — do not add others)
-- **#73C8E0** — soft cyan: primary highlight, active paths, key data
-- **#000000** — pure black: maximum contrast, critical emphasis
-- **#D9D3C7** — light beige-gray: neutral chart segments, inactive
-- **#B8B1A6** — subtle backgrounds, inactive data, secondary fills
+Use these defaults unless the user supplies a brand palette:
 
-### Semantic Colors (use only for meaning)
-- **#B91C1C** — error / failure / critical signal (muted deep red)
-- **#D97706** — warning / intermediate state (warm amber)
-- **#2D7A4F** — success / positive signal (muted green)
+| Profile | Use When | Background | Core | Main Path | Novelty / Output | Optional / External | Warning |
+|---------|----------|------------|------|-----------|------------------|---------------------|---------|
+| **sci-light** | General scientific software, algorithms, repo architecture | `#FFFFFF` / `#FAFAF7` | slate `#24313A` only for the central orchestrator; normal modules use light fills | cyan-blue `#2AA7C8` | soft blue `#E8F4FA` | gray dashed `#9AA6AF` | amber `#F2B84B`, coral `#D96C5F` |
+| **bio-evidence** | Biology, protein design, wet-lab or evidence workflows | `#FFFFFF` / `#F8FBF8` | deep teal `#234E52` sparingly | cyan-teal `#1FA6B8` | mint `#DFF3EA` / green-teal `#2F8F6B` | gray-green dashed `#AAB8B2` | amber `#E5A93C`, muted red `#C75C54` |
+| **systems-blue** | Infrastructure, developer tools, pipelines, agents | `#FFFFFF` / `#F7FAFC` | slate `#26323D` sparingly | blue `#2F80C1` | pale cyan `#E4F3FA` | gray dashed `#A4B0BA` | amber `#E6A23C`, red `#C84B4B` |
+| **data-violet** | Analytics, evaluation, benchmarks, knowledge graphs | `#FFFFFF` / `#FAF9FC` | charcoal `#2C2E35` sparingly | indigo `#5B6FD6` | lavender `#ECEBFA` | gray dashed `#A8AAB7` | amber `#D99A2B`, red `#C95F5F` |
+| **security-amber** | Risk, verification, safety, compliance, threat models | `#FFFFFF` / `#FCFAF5` | slate-brown `#34302A` sparingly | amber `#D9902F` | pale gold `#FFF1CC` | gray dashed `#AAA39A` | red `#B94A48` |
+| **product-muted** | Product/system explainers, SaaS-like but still scholarly | `#FFFFFF` / `#FAFAF7` | graphite `#2B3035` sparingly | muted teal `#2D9C9C` | pale teal `#E3F4F2` | gray dashed `#A6ADB3` | amber `#D8A03D`, coral `#D66A5F` |
+
+### Universal Color Roles
+
+- **Central orchestrator / core claim**: one dark filled node at most, preferably deep slate
+  rather than pure black.
+- **Normal deterministic modules**: white or very light gray fills with dark slate borders.
+- **Primary execution path**: one saturated accent color, used mainly for arrows and one
+  small set of high-priority labels.
+- **Novel output / evidence / provenance**: a distinct pale fill, often mint or soft blue,
+  so the innovation has its own visual identity.
+- **Optional / external / uncertain**: light gray fill, dashed outlines, lower contrast.
+- **Warnings / failures / blockers**: muted amber or coral/red only where semantically needed.
 
 ### Color Rules
-- Dominant palette: beige + black + white
-- Cyan (#73C8E0) = primary highlight ONLY — use sparingly
-- Max 3–4 colors in any single chart
-- Never use bright, saturated, or gradient colors
-- Charts: cyan / black / beige-gray + optional red or amber when semantically needed
-- Use black for structural anchors and cyan for the single most important path or number.
-  If everything is highlighted, nothing is highlighted.
+
+- Avoid large pure-black filled boxes. Black is too heavy for most SCI-style main figures.
+- Use dark fill only for the single central engine/orchestrator, if a dark anchor is needed.
+- Keep most nodes light; let hierarchy come from grouping, line weight, and arrows.
+- Do not use one-note palettes dominated by variations of one hue.
+- Max 4 semantic colors per figure, plus neutral grays.
+- Every color must have a role. Do not add color for decoration.
+- The figure must remain understandable in grayscale.
 
 ---
 
@@ -78,7 +87,7 @@ arrows. If a diagram has more than 14 nodes, group nodes into stages or layers f
 ```
 POSTER TITLE     → 28–36px, weight 800, #111111
 SECTION HEADER   → 11px, weight 700, #111111, UPPERCASE, letter-spacing 0.12em
-KEY NUMBER       → 48–64px, weight 800, #111111 or #73C8E0
+KEY NUMBER       → 48–64px, weight 800, text-primary or selected accent
 SUBSECTION       → 14px, weight 600, #111111
 BODY TEXT        → 12–13px, weight 400, #4A4A4A
 LABEL            → 11px, weight 500, #4A4A4A
@@ -100,9 +109,9 @@ CAPTION/FOOTER   → 9–10px, weight 400, #7A7A7A
 ## LINE & BORDER SYSTEM
 
 - Stroke weight: 1–1.5px for diagrams, 0.5px for dividers
-- Section dividers: `border-top: 1px solid #D9D3C7`
-- Card borders: `border: 1px solid #D9D3C7` with `border-radius: 3px`
-- Flow arrows: 1.5px, color #4A4A4A or #73C8E0 for highlighted paths
+- Section dividers: 1px neutral border from the selected palette
+- Card borders: 1px neutral border with `border-radius: 3px`
+- Flow arrows: 1.5px neutral; highlighted path uses the selected main-path accent
 - No heavy borders or drop shadows (max: `box-shadow: 0 1px 4px rgba(0,0,0,0.06)`)
 - Dashed lines: for optional/conditional paths, uncertainty
 
@@ -113,22 +122,23 @@ CAPTION/FOOTER   → 9–10px, weight 400, #7A7A7A
 ### Node Types
 | Element | Style |
 |---------|-------|
-| Process / Module | Rounded rect, `#111111` fill, white text OR white fill, `#111111` border |
-| Data / Storage | Slightly rounded rect, `#D9D3C7` fill, `#4A4A4A` text |
-| Input / Output | Parallelogram or labeled rect, `#73C8E0` accent |
+| Central Orchestrator | Rounded rect, selected dark slate fill, white text; use once |
+| Process / Module | Rounded rect, white/light fill, dark slate border |
+| Data / Storage | Slightly rounded rect, pale neutral or novelty fill |
+| Input / Output | Labeled rect or parallelogram with selected main-path accent |
 | Decision | Diamond or rounded rect with `?` marker |
-| Highlight / Key | `#73C8E0` fill, `#111111` text, 1.5px border |
-| External System | Dashed border, `#B8B1A6` fill |
-| Loop / Feedback | Circular arrow or return path, dashed `#73C8E0` |
+| Highlight / Key | Pale accent fill with dark text, not saturated fill unless tiny |
+| External System | Dashed border, light neutral fill |
+| Loop / Feedback | Circular arrow or return path, dashed selected accent |
 
 ### Edge Types
 | Connection | Style |
 |-----------|-------|
-| Primary data flow | Solid arrow, 1.5px, `#4A4A4A` |
-| Key / highlighted path | Solid arrow, 2px, `#73C8E0` |
-| Feedback / return | Dashed arrow, 1.5px, `#73C8E0` |
-| Conditional | Dashed arrow, 1px, `#7A7A7A` |
-| Error path | Solid arrow, 1.5px, `#B91C1C` |
+| Primary data flow | Solid arrow, 1.5px, dark neutral |
+| Key / highlighted path | Solid arrow, 2px, selected main-path accent |
+| Feedback / return | Dashed arrow, 1.5px, selected accent |
+| Conditional | Dashed arrow, 1px, neutral gray |
+| Error path | Solid arrow, 1.5px, muted red/coral |
 
 ### Diagram Quality Rules
 
@@ -138,6 +148,8 @@ CAPTION/FOOTER   → 9–10px, weight 400, #7A7A7A
   a two-level diagram.
 - Align nodes to a grid. Mixed alignment makes technical diagrams look unfinished.
 - Use one highlighted path per diagram unless the content genuinely has multiple modes.
+- Give the novelty/output artifact a separate pale semantic fill so it does not look like
+  a generic endpoint.
 
 ---
 
@@ -158,7 +170,8 @@ CAPTION/FOOTER   → 9–10px, weight 400, #7A7A7A
 - Direct labeling on bars/points — no legends if avoidable
 - Show exact values always
 - Max 3–4 colors per chart
-- Bar charts: primary color = cyan, comparison = black/beige-gray
+- Bar charts: primary color = selected main-path accent; comparison = slate/neutral;
+  evidence/provenance = selected novelty color.
 
 ---
 
@@ -241,7 +254,7 @@ Simple outline icons, thin stroke (1.5px), monochrome, functional not decorative
 - **Orientation**: Portrait (A1 ratio — approximately 594 × 841mm proportions)
 - **HTML equivalent**: ~800px wide × 1130px tall (or taller for complex content)
 - **Aspect ratio**: ~1:1.415
-- Background: `#F4F1EC`
+- Background: selected palette background, usually white or very light warm gray
 - All content within consistent margins
 
 ---

@@ -163,7 +163,7 @@ Abstraction: directory/package level
 ```
 If there is a particularly complex core path (e.g., request lifecycle, training loop):
 - Show individual functions/classes for that path only
-- Mark it as "CRITICAL PATH" with cyan highlight
+- Mark it as "CRITICAL PATH" with the selected main-path accent
 ```
 
 ---

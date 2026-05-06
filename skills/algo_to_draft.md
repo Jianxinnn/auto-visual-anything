@@ -163,7 +163,7 @@ For each component:
 ```
 [Component Name]
   Shape:       [box / circle / diamond / cylinder / parallelogram]
-  Fill:        [dark primary / light neutral / cyan highlight / dashed external]
+  Fill:        [central orchestrator dark fill / light deterministic module / novelty-output fill / dashed external]
   Label:       [concise name, ≤3 words]
   Annotation:  [data type or brief description, ≤5 words]
   Role:        [INPUT / PROCESS / DECISION / STATE / OUTPUT / EXTERNAL]
@@ -178,7 +178,7 @@ For each connection:
 [Source] → [Target]
   Edge type:   [solid / dashed / bidirectional / feedback]
   Label:       [data being transferred, ≤3 words]
-  Color:       [black (normal) / cyan (highlighted) / red (error) / dashed-cyan (feedback)]
+  Color:       [neutral normal / selected main-path accent / muted error / dashed accent feedback]
 ```
 
 ### 2.4 Layout Construction

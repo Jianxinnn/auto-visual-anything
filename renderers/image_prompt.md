@@ -88,6 +88,14 @@ Unknowns:
 
 ## Prompt Writing Rules
 
+### Evidence-Bound Numbers
+
+Numbers in the core prompt are only allowed when they are explicitly supported by the
+analysis block. Do not invent counts such as files inspected, lines inspected, dependency
+counts, number of API modes, or confidence percentages. If the analyzed source does not
+provide a number, write `unknown`, omit the stat panel, or use a qualitative label such as
+`compact skill repo`.
+
 ### Preserve Scientific Structure
 
 The prompt must encode the actual source structure:

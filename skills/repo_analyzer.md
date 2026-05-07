@@ -129,6 +129,14 @@ Count and surface only what can be measured from the inspected files:
 - Circular dependencies if detected; otherwise say "not detected in inspected graph"
 - Lines of code per top-level module if cheaply measurable; otherwise omit
 
+Metric discipline:
+- Do not include line counts, file counts, dependency counts, or "files inspected" unless
+  they came from an explicit command or inspected artifact.
+- If a metric was not measured, omit it or label it `unknown`; never estimate a number to
+  make the figure look complete.
+- If the final image prompt asks for evidence/stat panels, every number in those panels
+  must appear in the evidence ledger with its source command or file.
+
 ---
 
 ## PHASE 2 — MULTI-LEVEL ARCHITECTURE PLAN

@@ -106,6 +106,21 @@ common workflow: analyze source → plan figure → paste optimized prompt into 
 For dense scientific figures with many exact labels, include a post-edit note recommending
 that final labels be added in Figma, Illustrator, PowerPoint, or SVG.
 
+If the user asks to both create the FigureFoundry prompt and directly generate an image,
+use this two-stage workflow:
+
+1. Complete FigureFoundry analysis and compile the `image_prompt` package first.
+2. Extract only the final core image prompt plus recommended size/quality/format.
+3. Invoke the available image-generation skill/tool using its own documented configuration flow.
+4. Do not read, copy, transform, or mix API keys between tools.
+5. Do not override the image tool's configured API base or token unless the user explicitly asks.
+6. Report both the prompt package location/content summary and the generated image path.
+
+When handing off to `gen-images`, first run its `--show-config` preflight in the same shell
+environment that will run generation. If `GEN_IMAGES_API_KEY` is configured in `~/.zshrc`,
+source `~/.zshrc` in that same shell. Never inject Codex or Claude credentials into
+`GEN_IMAGES_API_KEY`; the image-generation skill owns its own runtime configuration.
+
 ---
 
 ## STEP 4 — ANNOUNCE AND PROCEED
@@ -147,6 +162,9 @@ The renderer is always the last step. Never compile a prompt or artifact before 
 For `image_prompt`, return the complete prompt package in the chat. For `html_artifact`, save
 the artifact as an HTML file in the current workspace when local filesystem access is available,
 unless the user requested a different destination.
+
+If direct image generation was requested, the prompt package still exists as the source of
+the generated image. Preserve it in the response or save it beside the image when practical.
 
 ---
 

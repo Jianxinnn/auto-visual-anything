@@ -7,6 +7,8 @@ editable HTML/SVG architecture artifacts.
 
 The installed skill id is `figure-foundry`.
 
+![FigureFoundry simple style preview](assets/figurefoundry-simple-style.png)
+
 ---
 
 ## What It Does
@@ -31,6 +33,8 @@ HTML, or SVG, use the optional HTML/SVG renderer.
 ```
 FigureFoundry/
 ├── SKILL.md                    ← Master entry point + router
+├── assets/
+│   └── figurefoundry-simple-style.png
 ├── router/
 │   └── intent_parser.md        ← Extended classification rules
 ├── skills/

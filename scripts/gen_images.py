@@ -6,6 +6,7 @@ import mimetypes
 import os
 import re
 import sys
+import time
 import tomllib
 import urllib.error
 import urllib.request
@@ -20,7 +21,6 @@ IMAGE_FIELDS = [
     "background",
     "output_format",
     "output_compression",
-    "partial_images",
     "moderation",
 ]
 RESPONSES_TOOL_FIELDS = [
@@ -333,7 +333,7 @@ def resolve_output_dir(out_dir: str | None):
 
 def save_images(image_entries, output_format: str | None, output_dir: Path):
     output_dir.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     paths = []
 
     for index, item in enumerate(image_entries, start=1):
@@ -413,6 +413,8 @@ def post_responses_stream(url: str, token: str, payload: dict):
     req = build_request(url, token, payload, "text/event-stream")
     latest_partial_b64 = None
     final_b64 = None
+    partial_count = 0
+    started_at = time.monotonic()
 
     try:
         with urllib.request.urlopen(req) as response:
@@ -435,6 +437,13 @@ def post_responses_stream(url: str, token: str, payload: dict):
                     partial = event.get("partial_image_b64")
                     if partial:
                         latest_partial_b64 = partial
+                        partial_count += 1
+                        elapsed = time.monotonic() - started_at
+                        print(
+                            f"[partial #{partial_count} elapsed={elapsed:.1f}s]",
+                            file=sys.stderr,
+                            flush=True,
+                        )
                     continue
 
                 if event_type == "response.failed":
@@ -551,6 +560,7 @@ def parse_args():
     parser.add_argument("--moderation")
     parser.add_argument("--input-fidelity", dest="input_fidelity")
     parser.add_argument("--stream", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--dry-run", dest="dry_run", action="store_true")
     return parser.parse_args()
 
 
@@ -562,6 +572,20 @@ def print_runtime_settings(settings: RuntimeSettings):
         "model": settings.model,
         "token_present": bool(settings.token),
     }, ensure_ascii=False))
+
+
+def redact_payload_for_output(value):
+    if isinstance(value, dict):
+        redacted = {}
+        for key, child in value.items():
+            if key == "image_url":
+                redacted[key] = "<redacted image_url>"
+            else:
+                redacted[key] = redact_payload_for_output(child)
+        return redacted
+    if isinstance(value, list):
+        return [redact_payload_for_output(item) for item in value]
+    return value
 
 
 def main():
@@ -579,6 +603,23 @@ def main():
         fail("缺少 mode")
 
     args.model = settings.model
+
+    if args.dry_run:
+        if args.stream and not (args.mode == "edit" and args.mask):
+            url = f"{settings.base_url}/responses"
+            payload = build_responses_payload(args)
+        else:
+            endpoint = "/images/generations" if args.mode == "generate" else "/images/edits"
+            url = f"{settings.base_url}{endpoint}"
+            payload = build_images_payload(args)
+        print(json.dumps({
+            "ok": True,
+            "dry_run": True,
+            "url": url,
+            "payload": redact_payload_for_output(payload),
+        }, ensure_ascii=False))
+        return
+
     stream_used = False
     response = None
 

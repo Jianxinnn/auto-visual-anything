@@ -1,199 +1,170 @@
 # gen-images 字段与交互规则
 
+> API 配置(`base_url` / `api_key` / 优先级 / 原子性 / 预检)见 `api-config.md`。
+
 ## 任务类型
 
-- 文生图：默认优先调用 `POST /v1/responses` 的 SSE 流式 Responses API；代理不支持时回退 `POST /v1/images/generations`
-- 改图：默认优先调用 `POST /v1/responses` 的 SSE 流式 Responses API；代理不支持或使用 `mask` 时回退 `POST /v1/images/edits`
+- **文生图**:默认调用 `POST /v1/responses`(SSE 流式 Responses API);代理不支持时回退 `POST /v1/images/generations`
+- **改图**:默认调用 `POST /v1/responses`;代理不支持或使用 `mask` 时回退 `POST /v1/images/edits`
 
-如果用户表达包含明确的图片来源（本地路径、URL、data URL）且语义是“修改图片 / 编辑图片 / 改图”，优先识别为改图。
+如果用户表达包含明确的图片来源(本地路径、URL、data URL)且语义是"修改图片 / 编辑图片 / 改图",优先识别为改图。
 
 ## 必填字段
 
-### 文生图
-- `prompt`
-
-如果缺少 `prompt`，先向用户追问，不要执行脚本。
-
-### 改图
-- `prompt`
-- 图片来源
-
-图片来源支持：
-- 本地图片路径
-- 图片 URL
-- data URL
-
-如果缺少图片来源，向用户明确提示二选一：
-1. 提供本地图片路径
-2. 提供图片 URL / data URL
+| 任务 | 必填 | 缺失时 |
+|------|------|--------|
+| 文生图 | `prompt` | 追问,不执行 |
+| 改图 | `prompt` + 图片来源(本地路径 / URL / data URL) | 追问,不执行 |
 
 ## 可选字段
 
-- `model`：默认 `gpt-image-2`
-- `response_format`：默认 `b64_json`
-- `stream`：默认 `true`，可用 `--no-stream` 强制走旧的非流式 `/images/*` 接口
-- `size`
-- `quality`
-- `background`
-- `output_format`
-- `output_compression`
-- `partial_images`：流式调用未显式传入时脚本默认使用 `1`
-- `n`：默认 `1`
-- `moderation`
-- `input_fidelity`（改图可用）
+| 字段 | 默认 | 说明 |
+|------|------|------|
+| `model` | `gpt-image-2` | 用户明确指定时才覆盖 |
+| `response_format` | `b64_json` | 固定 |
+| `stream` | `true` | `--no-stream` 强制走旧 `/images/*` |
+| `size` | — | 见自然语言映射 |
+| `quality` | — | |
+| `background` | — | |
+| `output_format` | — | 默认保存 `png` |
+| `output_compression` | — | 仅 `jpg`/`jpeg`/`webp` 且用户明确要求压缩时传 |
+| `partial_images` | `1`(流式默认) | 用户明确要求中间图数量时才覆盖 |
+| `n` | `1` | |
+| `moderation` | — | 用户明确要求时才传 |
+| `input_fidelity` | — | 仅改图可用 |
 
-本地保存字段：
-- `out_dir`：本地输出目录，只传给脚本的 `--out-dir`，不进入图片接口 payload；未指定时使用 `<task_cwd>/gen-images/`
+**本地保存字段:**
 
-## API 配置字段
+- `out_dir`:只传 `--out-dir`,**不进入 API payload**;未指定时使用 `<task_cwd>/gen-images/`
 
-API 连接配置只包含：
-- `base_url` / `api_base`
-- `api_key` / `token`
-- `api_key_env` / `token_env`
-- `model`
-
-配置来源优先级：
-1. 命令行：`--api-base`、`--api-key`、`--api-key-env`、`--model`
-2. 环境变量：`GEN_IMAGES_API_BASE`、`GEN_IMAGES_API_KEY`、`GEN_IMAGES_MODEL`
-3. 独立配置文件：`$GEN_IMAGES_CONFIG`、`$XDG_CONFIG_HOME/gen-images/config.toml`、`~/.config/gen-images/config.toml`、`~/.gen-images/config.toml`
-4. Codex 配置：`~/.codex/config.toml`、`~/.codex/auth.json`
-5. Claude Code 配置：`~/.claude/settings.json`
-
-运行前配置规则：
-- 实际生成前先在同一 shell 环境中 source 用户环境并运行 `--show-config`
-- 如果独立配置指定 `api_key_env`，只允许从该环境变量取 key
-- 不要把 Codex / Claude 的 token 注入到 `GEN_IMAGES_API_KEY`
-- 不要混用不同配置来源的 `base_url` 和 token
-- `source`、`base_url`、`model`、`token_present` 可以展示；完整 token 永远不要展示
-
-不要把 `size`、`quality`、`output_format` 写入 API 配置文件。这些生成参数由用户自然语言、当前 LLM 的保守推断和命令行参数控制。
-也不要把 `out_dir` 写入 API 配置文件；它只描述本次任务的本地保存位置。
-
-## 自然语言映射
-
-### size
-- `1024x1024`、`1:1` -> `size=1024x1024`
-- `1024x1536`、`3:4` -> `size=1024x1536`
-- `1536x1024`、`4:3` -> `size=1536x1024`
-- `2048x2048` -> `size=2048x2048`
-- `3840x2160`、`16:9` -> `size=3840x2160`
-- `2160x3840`、`9:16` -> `size=2160x3840`
-- `4k横向`、`16:9` -> `size=3840x2160`
-- `4k竖向`、`9:16` -> `size=2160x3840`
-- `auto` -> `size=auto`
-- 如果用户明确给出上述尺寸或比例，优先映射到对应 `size`
-
-### LLM 语义推断 size
-
-如果用户没有明确给出尺寸或比例，但 prompt 的用途清楚，允许当前 LLM 做保守推断：
-
-- `头像`、`图标`、`logo`、`表情包`、`贴纸`、`商品主图`、`方形社媒图` -> `size=1024x1024`
-- `海报`、`封面`、`人物半身/全身`、`竖版构图`、`小红书封面` -> `size=1024x1536`
-- `横幅`、`banner`、`视频封面`、`演示背景`、`横版构图` -> `size=1536x1024`
-- `手机壁纸`、`竖屏壁纸`、`短视频封面`、`9:16` -> `size=2160x3840`
-- `桌面壁纸`、`4k横向壁纸`、`16:9` -> `size=3840x2160`
-
-不要仅因为 prompt 很长、风格复杂或包含“高清”就自动选择 4k；只有用途明显需要大尺寸展示、壁纸、16:9/9:16，或用户明确提到 4k 时才选择 4k 尺寸。
-
-### quality
-- `高清`、`高质量`、`高品质` -> `quality=high`
-- `中等质量` -> `quality=medium`
-- `低质量` -> `quality=low`
-- `精细`、`商用`、`主视觉`、`壁纸`、`海报`、`产品图` -> `quality=high`
-- `草图`、`快速预览`、`低成本试稿` -> `quality=low`
-
-### background
-- `透明背景` -> `background=transparent`
-- `白色背景` -> `background=white`
-- `黑色背景` -> `background=black`
-- `无背景`、`抠图`、`贴纸`、`图标`、`logo` 且不是完整场景图 -> `background=transparent`
-- `白底`、`黑底` -> 分别映射 `background=white`、`background=black`
-
-### output_format
-- `png` -> `output_format=png`
-- `jpg` -> `output_format=jpg`
-- `jpeg` -> `output_format=jpeg`
-- `webp` -> `output_format=webp`
-
-如果用户自然语言中明确要求保存格式，按要求保存；否则默认保存为 `png`。
-如果推断出 `background=transparent` 且用户没有指定格式，使用 `output_format=png`。
-
-### n
-- `生成3张`、`来3张`、`输出3张` -> `n=3`
-- `多方案`、`给几个版本` 且没有明确数量 -> `n=3`
-- 未指定时默认 `n=1`
-
-### output_compression
-
-- 用户明确要求 `压缩`、`小体积`、`控制文件大小`，且 `output_format` 为 `jpg`、`jpeg` 或 `webp` 时，才传 `output_compression`
-- 如果用户没有给具体压缩率，不要猜具体数值，省略该字段
-
-### out_dir
-
-- 先确定 `task_cwd`：用户当前打开的项目/工作区目录，而不是 skill 安装目录、脚本目录或 `$CODEX_HOME`
-- 用户没有指定保存目录时，设置 `out_dir=<task_cwd>/gen-images`
-- 用户说 `保存到`、`输出到`、`放到` 某个目录时，设置为该目录；相对路径按 `task_cwd` 解析
-- `out_dir` 只作为 `scripts/gen_images.py --out-dir` 传递，不进入 API payload
-
-### input_fidelity
-
-仅改图可用：
-
-- `保持脸/人物/主体/产品一致`、`只改风格` -> `input_fidelity=high`
-- `大幅重绘`、`重新设计`、`完全换风格` -> 不设置 `input_fidelity`，或在用户明确要求低保真时设置 `input_fidelity=low`
-
-### 不建议推断的字段
-
-- `model`：只有用户明确指定模型或明确要求使用 pro/某个模型名时才传
-- `moderation`：只有用户明确要求时才传
-- `partial_images`：只有用户明确要求中间图数量时才传；否则交给脚本默认值
-
-## timeout 规则
-
-Bash 调用 `scripts/gen_images.py` 前，先根据 `size` 计算本次工具调用的 `timeout`：
-
-- 当 `size` 可解析为 `宽x高`，且总像素量 `宽 * 高 >= 8000000` 时，使用 `timeout=900000`（15 分钟）
-- 其余情况使用 `timeout=600000`（10 分钟）
-- `auto`、缺少 `size`、或无法解析尺寸时，按非 4k 处理，使用 `timeout=600000`
-
-执行时按这个顺序判断：
-1. 读取已提取的 `size`
-2. 如果 `size` 匹配 `^\d+x\d+$`，拆出宽高并计算总像素量
-3. 若总像素量 `>= 8000000`，本次 Bash 调用使用 `timeout=900000`
-4. 否则本次 Bash 调用使用 `timeout=600000`
+**不要写入 API 配置文件:** `size`、`quality`、`output_format`、`out_dir` 等生成/本地参数。它们由用户自然语言、LLM 保守推断、命令行参数控制。
 
 ## 字段优先级
 
 1. 用户明确写出的字段值
 2. 用户自然语言中的明确要求
-3. 当前 LLM 根据 prompt 和用途做出的保守推断
+3. LLM 根据 prompt 用途的保守推断
 4. 脚本默认值
+
+## 自然语言映射
+
+### size
+
+| 自然语言 | 映射 |
+|----------|------|
+| `1024x1024`、`1:1` | `1024x1024` |
+| `1024x1536`、`3:4` | `1024x1536` |
+| `1536x1024`、`4:3` | `1536x1024` |
+| `2048x2048` | `2048x2048` |
+| `3840x2160`、`16:9`、`4k横向` | `3840x2160` |
+| `2160x3840`、`9:16`、`4k竖向` | `2160x3840` |
+| `auto` | `auto` |
+
+### quality
+
+- `高清`、`高质量`、`高品质` → `high`
+- `中等质量` → `medium`
+- `低质量` → `low`
+
+### background
+
+- `透明背景`、`无背景`、`抠图` → `transparent`
+- `白色背景`、`白底` → `white`
+- `黑色背景`、`黑底` → `black`
+
+### output_format
+
+- `png` / `jpg` / `jpeg` / `webp` → 同名
+
+明确要求保存格式时按要求保存;否则默认 `png`;推断 `background=transparent` 且未指定格式时使用 `png`。
+
+### n
+
+- `生成3张`、`来3张`、`输出3张` → `n=3`
+- `多方案`、`给几个版本` 且无明确数量 → `n=3`
+- 未指定 → `1`
+
+### output_compression
+
+仅当用户明确要求 `压缩` / `小体积` / `控制文件大小`,且 `output_format` 为 `jpg`/`jpeg`/`webp` 时传。无具体压缩率时**不要猜数值**,省略该字段。
+
+### out_dir
+
+- 先确定 `task_cwd`(用户当前打开的项目/工作区目录,**不是** skill 安装目录、脚本目录、`$CODEX_HOME`)
+- 用户未指定 → `<task_cwd>/gen-images`
+- 用户说 `保存到`、`输出到`、`放到` 某目录 → 该目录;相对路径按 `task_cwd` 解析
+
+### input_fidelity(仅改图)
+
+- `保持脸/人物/主体/产品一致`、`只改风格` → `high`
+- `大幅重绘`、`重新设计`、`完全换风格` → 不设置(或用户明确要求低保真时设 `low`)
+
+## LLM 语义推断
+
+用户没有明确给出可选字段,但 prompt 用途清楚时,允许保守推断:
+
+### size 推断
+
+- `头像`、`图标`、`logo`、`表情包`、`贴纸`、`商品主图`、`方形社媒图` → `1024x1024`
+- `海报`、`封面`、`人物半身/全身`、`竖版构图`、`小红书封面` → `1024x1536`
+- `横幅`、`banner`、`视频封面`、`演示背景`、`横版构图` → `1536x1024`
+- `手机壁纸`、`竖屏壁纸`、`短视频封面`、`9:16` → `2160x3840`
+- `桌面壁纸`、`4k横向壁纸`、`16:9` → `3840x2160`
+
+**不要**仅因为 prompt 长、风格复杂或包含"高清"就自动选 4k。只有用途明显需要大尺寸展示、壁纸、16:9/9:16,或用户明确提到 4k 时才用 4k 尺寸。
+
+### quality 推断
+
+- `精细`、`商用`、`主视觉`、`壁纸`、`海报`、`产品图` → `high`
+- `草图`、`快速预览`、`低成本试稿` → `low`
+
+### background 推断
+
+- `贴纸`、`图标`、`logo` 且不是完整场景图 → `transparent`
+
+### 不建议推断的字段
+
+- `model`:用户明确指定时才传
+- `moderation`:用户明确要求时才传
+- `partial_images`:用户明确要求中间图数量时才传
+
+## timeout 规则
+
+Bash 调用 `scripts/gen_images.py` 前,根据 `size` × `n` 计算本次 Bash 工具调用的 `timeout`:
+
+| 条件 | 单张基准 |
+|------|---------|
+| `size` 可解析为 `宽x高` 且 `宽 × 高 ≥ 8,000,000` | `900000`(15 分钟) |
+| 其余情况(含 `auto`、缺 `size`、无法解析) | `600000`(10 分钟) |
+
+**实际 timeout = 单张基准 × n**(脚本对 `n` 串行调用 `/responses`,必须按张累加)。超过 Bash 工具上限时取上限。
+
+执行顺序:
+
+1. 读取已提取的 `size` 与 `n`(默认 `n=1`)
+2. 若 `size` 匹配 `^\d+x\d+$`,拆分宽高并计算总像素;否则按"其余"档
+3. 总像素 ≥ 8,000,000 → 单张基准 = `900000`,否则 `600000`
+4. `timeout = 单张基准 × n`,超出工具上限取上限
 
 ## 交互规则
 
-### 文生图缺 prompt
-使用简短追问：
+| 场景 | 追问话术 |
+|------|----------|
+| 文生图缺 `prompt` | `请补充图片提示词,例如你想生成什么画面。` |
+| 改图缺图片来源 | `请提供要编辑的图片来源:1)本地路径 2)图片 URL / data URL` |
+| 改图缺 `prompt` | `请补充修改要求,例如你想把图片改成什么效果。` |
 
-`请补充图片提示词，例如你想生成什么画面。`
+## 输出格式
 
-### 改图缺图片来源
-使用简短追问：
+### 成功
 
-`请提供要编辑的图片来源：1）本地路径 2）图片 URL / data URL`
+```text
+图片已生成, 图片路径: <路径>
+实际使用的关键参数: model=..., size=..., quality=..., output_format=..., n=..., stream=..., out_dir=...
+```
 
-### 改图缺 prompt
-使用简短追问：
+### 失败
 
-`请补充修改要求，例如你想把图片改成什么效果。`
-
-## 成功输出格式
-
-成功后向用户报告：
-- `图片已生成, 图片路径: <路径>`
-- `实际使用的关键参数: model=..., size=..., quality=..., output_format=..., n=..., stream=..., out_dir=...`
-
-## 失败输出格式
-
-失败后向用户报告：
-- `生成失败: <简短错误原因>`
+```text
+生成失败: <简短错误原因>
+```

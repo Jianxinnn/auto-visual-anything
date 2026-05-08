@@ -8,7 +8,7 @@ FigForge is a coordinator skill for turning source material into a generated sci
 
 ## Call Flow
 
-![FigForge call flow](assets/figforge-call-flow.svg)
+![FigForge call flow](assets/figforge-call-flow.png)
 
 The normal full pipeline is:
 
@@ -27,6 +27,7 @@ figforge/
 ├── SKILL.md
 ├── README.md
 └── assets/
+    ├── figforge-call-flow.png
     └── figforge-call-flow.svg
 ```
 

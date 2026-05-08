@@ -1,6 +1,6 @@
-# Visual System — FigureFoundry
+# Visual System — figforge-plan
 
-This file defines the shared visual language for ALL FigureFoundry outputs.
+This file defines the shared visual language for ALL figforge-plan outputs.
 Every sub-skill and renderer must follow these rules exactly.
 
 ---
@@ -25,7 +25,7 @@ alignment, white space, and a strong central diagram to create a premium technic
 
 ## SIGNATURE COMPOSITION
 
-Every FigureFoundry output should have a recognizable editorial composition:
+Every figforge-plan output should have a recognizable editorial composition:
 
 1. **Dominant claim** — one large title/question/answer pair that explains the point.
 2. **Hero visual** — one central architecture diagram or mechanism diagram that carries
@@ -40,7 +40,7 @@ arrows. If a diagram has more than 14 nodes, group nodes into stages or layers f
 
 ## PALETTE SYSTEM
 
-FigureFoundry does not use one fixed color scheme for every project. Select a palette
+figforge-plan does not use one fixed color scheme for every project. Select a palette
 based on the source domain and the figure's main claim, then state the palette rationale
 in the prompt package.
 

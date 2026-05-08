@@ -1,4 +1,4 @@
-# Evidence Discipline — FigureFoundry
+# Evidence Discipline — figforge-plan
 
 Single source of truth for evidence, assumption, and unknown handling across every
 sub-skill and renderer. All sub-skills inherit these rules; do not redefine them locally.

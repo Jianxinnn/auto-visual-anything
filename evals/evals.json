@@ -1,16 +1,16 @@
 {
-  "skill_name": "figure-foundry",
-  "project_name": "FigureFoundry",
+  "skill_name": "figforge-plan",
+  "project_name": "figforge-plan",
   "evals": [
     {
       "id": 1,
       "prompt": "Analyze this local TypeScript repo and generate an optimized image-generation prompt package for a polished architecture main figure. Focus on entry points, services, external dependencies, and the main request flow.",
-      "expected_output": "A FigureFoundry Prompt Package for a repo architecture figure, with source-backed structure, source paths, unknowns, label priority, negative prompt, and recommended generation settings.",
+      "expected_output": "A figforge-plan Prompt Package for a repo architecture figure, with source-backed structure, source paths, unknowns, label priority, negative prompt, and recommended generation settings.",
       "files": [],
       "assertions": [
         "Uses CODE_REPO route, not ALGO_TEXT.",
         "Reads repository manifests and entry points before compiling the prompt package.",
-        "Returns the exact FigureFoundry Prompt Package sections.",
+        "Returns the exact figforge-plan Prompt Package sections.",
         "Includes source paths or source discipline notes.",
         "Marks unknown external systems instead of inventing them."
       ]
@@ -24,7 +24,7 @@
         "Uses RESEARCH_PAPER route.",
         "Separates available source coverage from missing paper sections.",
         "Does not fabricate author, venue, dataset, baseline, or metric values.",
-        "Uses FigureFoundry scientific figure style.",
+        "Uses figforge-plan scientific figure style.",
         "Warns that dense exact labels may require post-editing."
       ]
     },

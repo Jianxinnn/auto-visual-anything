@@ -17,7 +17,7 @@ fingerprint from the input image** (box style, edge style, grouping method, nami
 convention, abstraction depth — see Phase 1.2). For `refine_existing`, preserve the
 original domain and meaning, only improve hierarchy, alignment, label priority, and
 visual emphasis. For `transpose_to_new_architecture`, keep the visual grammar and only
-swap the problem domain. Do not impose the FigureFoundry editorial palette over a
+swap the problem domain. Do not impose the figforge-plan editorial palette over a
 clearly different source style; respect what the image is. If the new domain has a
 strong cliché list (e.g., transposing into ML / security / bio), consult
 `style/domain_hints.md` for the avoid items.

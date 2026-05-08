@@ -1,17 +1,17 @@
 ---
-name: figure-foundry
+name: figforge-plan
 description: >
-  FigureFoundry: use when the user wants to turn a source artifact into a publication-quality
+  figforge-plan: use when the user wants to turn a source artifact into a publication-quality
   scientific figure plan, optimized image-generation prompt, or optional editable HTML/SVG
   schematic. Trigger for "make a main figure", "generate a prompt for this paper/repo",
   "visualize this system", "draw the architecture", "turn this into a diagram/poster",
-  "map this repo", "paper figure prompt", "生图", "绘图 prompt", or any request converting
+  "map this repo", "paper figure prompt", "论文主图 prompt", "绘图 prompt", or any request converting
   a paper, GitHub repo, local codebase, diagram, algorithm, or system description into a
   scientific figure prompt package. Do not trigger for ordinary code review, debugging, or
   text-only architecture discussion unless the user asks for a visual/prompt output.
 ---
 
-# FigureFoundry — Source → Scientific Figure
+# figforge-plan — Source → Scientific Figure
 
 Turn technical material (code, paper, diagram, algorithm, or design request) into a
 truthful, publication-quality figure spec. Default output: an image-generation prompt

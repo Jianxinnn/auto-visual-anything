@@ -1,8 +1,8 @@
 # Image Generation Handoff
 
-**Purpose**: Capture the operational details for handing off a FigureFoundry prompt
+**Purpose**: Capture the operational details for handing off a figforge-plan prompt
 package to an image-generation tool. Read this file only when the user asks
-FigureFoundry to both compile the prompt **and** generate the image.
+figforge-plan to both compile the prompt **and** generate the image.
 
 For prompt-only workflows, ignore this file.
 
@@ -12,22 +12,22 @@ For prompt-only workflows, ignore this file.
 
 When the user wants the prompt produced *and* an image generated in the same turn:
 
-1. Complete FigureFoundry analysis and compile the full `image_prompt` package first.
+1. Complete figforge-plan analysis and compile the full `image_prompt` package first.
 2. Extract the final core image prompt plus recommended size/quality/format/aspect-ratio.
 3. Invoke the available image-generation skill/tool with **its own documented configuration flow**.
-4. Do not read, copy, transform, or mix API keys between FigureFoundry and the image tool.
+4. Do not read, copy, transform, or mix API keys between figforge-plan and the image tool.
 5. Do not override the image tool's configured API base or token unless the user explicitly asks.
 6. Report both the prompt package (location or content summary) and the generated image path.
 
 ---
 
-## Boundaries with `gen-images`
+## Boundaries with `figforge-gen`
 
-When the available image tool is `gen-images`:
+When the available image tool is `figforge-gen`:
 
-- Run `gen-images --show-config` as a preflight in the same shell that will perform generation.
-- If `GEN_IMAGES_API_KEY` is configured in `~/.zshrc`, source `~/.zshrc` in that same shell.
-- Never inject Codex- or Claude-side credentials into `GEN_IMAGES_API_KEY`. The image
+- Run `figforge-gen --show-config` as a preflight in the same shell that will perform generation.
+- If `FIGFORGE_GEN_API_KEY` is configured in `~/.zshrc`, source `~/.zshrc` in that same shell.
+- Never inject Codex- or Claude-side credentials into `FIGFORGE_GEN_API_KEY`. The image
   skill owns its runtime configuration.
 - If preflight fails, return the prompt package only and explain what configuration is missing.
 

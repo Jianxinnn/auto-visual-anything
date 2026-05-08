@@ -28,7 +28,7 @@ Output: A copy-ready prompt package, not an image.
 Always return this exact structure:
 
 ```markdown
-# FigureFoundry Prompt Package
+# figforge-plan Prompt Package
 
 ## 1. Figure Brief
 [1 short paragraph describing the scientific message and intended venue/style.]

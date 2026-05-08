@@ -1,13 +1,13 @@
-# FigureFoundry Skill Project
+# figforge-plan Skill Project
 
-FigureFoundry is a source-to-scientific-figure planning skill for agents.
+figforge-plan is a source-to-scientific-figure planning skill for agents.
 It converts codebases, papers, diagrams, algorithm descriptions, and design requests into
 publication-quality figure plans, optimized image-generation prompt packages, and optional
 editable HTML/SVG architecture artifacts.
 
-The installed skill id is `figure-foundry`.
+The installed skill id is `figforge-plan`.
 
-![FigureFoundry simple style preview](assets/figurefoundry-simple-style.png)
+![figforge-plan simple style preview](assets/figforge-simple-style.png)
 
 ---
 
@@ -22,7 +22,7 @@ The installed skill id is `figure-foundry`.
 | Mixed inputs | Unified prompt package with source authority and conflicts |
 | Design request (no input) | Original architecture figure prompt with explicit assumptions |
 
-Default output is a **FigureFoundry Prompt Package** that the user can paste into an
+Default output is a **figforge-plan Prompt Package** that the user can paste into an
 image-generation tool. If the user asks for deterministic labels, editable vector output,
 HTML, or SVG, use the optional HTML/SVG renderer.
 
@@ -31,10 +31,10 @@ HTML, or SVG, use the optional HTML/SVG renderer.
 ## Project Structure
 
 ```
-FigureFoundry/
+figforge-plan/
 ├── SKILL.md                    ← Master entry point + router
 ├── assets/
-│   └── figurefoundry-simple-style.png
+│   └── figforge-simple-style.png
 ├── router/
 │   ├── intent_parser.md        ← Extended classification rules
 │   └── image_handoff.md        ← Optional handoff to image-generation tools
@@ -58,7 +58,7 @@ FigureFoundry/
 
 ## Visual Style
 
-All outputs follow the **FigureFoundry editorial style**:
+All outputs follow the **figforge-plan editorial style**:
 - Domain-aware scientific palettes selected from the source and figure claim
 - Strong typographic hierarchy (large numbers dominate when useful)
 - A single restrained accent for the primary path or main claim
@@ -107,11 +107,11 @@ Per-domain `Favor`/`Avoid` lists and the universal anti-cliché catalog live in
 
 ## Installation
 
-Copy the `FigureFoundry/` directory to your agent skills folder. For Codex-style skill
+Copy the `figforge-plan/` directory to your agent skills folder. For Codex-style skill
 directories, the important entry point is:
 
 ```
-FigureFoundry/SKILL.md
+figforge-plan/SKILL.md
 ```
 
 Package only the project files, not `.DS_Store`, build output, or local eval workspaces.

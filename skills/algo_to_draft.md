@@ -3,7 +3,7 @@
 **Trigger**: Input is a text description of an algorithm, pseudocode, bullet-point spec,
 technical writeup, or any textual representation of a computational process.
 
-**Output**: Algorithm/process figure plan in the FigureFoundry editorial style, passed to
+**Output**: Algorithm/process figure plan in the figforge-plan editorial style, passed to
 the renderer selected by the router (`renderers/image_prompt.md` by default).
 
 **Domain truth rule**: preserve the algorithm's actual semantics. Do not add stages,

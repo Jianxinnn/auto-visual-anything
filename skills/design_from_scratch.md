@@ -3,7 +3,7 @@
 **Trigger**: User requests a new system/algorithm design with no reference input.
 e.g., "Design me a recommendation system", "Create an architecture for X", "How would you build Y?"
 
-**Output**: Complete original architecture figure plan in the FigureFoundry editorial
+**Output**: Complete original architecture figure plan in the figforge-plan editorial
 style, passed to the renderer selected by the router (`renderers/image_prompt.md` by
 default).
 

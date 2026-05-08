@@ -1,13 +1,13 @@
 # Router: Intent Parser
 
-**Purpose**: Detailed classification rules for the FigureFoundry master router.
+**Purpose**: Detailed classification rules for the figforge-plan master router.
 Read this file only if the main router's detection rules are ambiguous.
 
 ---
 
 ## Routing Principle
 
-FigureFoundry should trigger only when the user wants a visual artifact, figure plan,
+figforge-plan should trigger only when the user wants a visual artifact, figure plan,
 or image-generation prompt. Once triggered, detect every strong input type before choosing
 a route. Mixed inputs should not be collapsed into a single route just because one signal
 appears first.

@@ -1,7 +1,7 @@
 # Renderer: HTML Artifact
 
 **Purpose**: Convert any assembled content block into a rendered HTML artifact
-in the selected FigureFoundry palette.
+in the selected figforge-plan palette.
 
 Use this renderer only when the user asks for editable HTML/SVG, deterministic labels,
 or a local vector artifact. Always read `style/visual_system.md` before executing this

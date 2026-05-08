@@ -3,17 +3,22 @@
 **Trigger**: Input is a text description of an algorithm, pseudocode, bullet-point spec,
 technical writeup, or any textual representation of a computational process.
 
-**Output**: Algorithm/process figure plan in the FigureFoundry editorial style. Compile it
-into an optimized image prompt package by default, or an editable HTML/SVG artifact when
-requested.
+**Output**: Algorithm/process figure plan in the FigureFoundry editorial style, passed to
+the renderer selected by the router (`renderers/image_prompt.md` by default).
 
-Read `style/visual_system.md` before executing this skill.
-After analysis, pass output to the selected renderer: `renderers/image_prompt.md` by default,
-or `renderers/html_artifact.md` for deterministic vector output.
+**Domain truth rule**: preserve the algorithm's actual semantics. Do not add stages,
+models, databases, metrics, or complexity claims unless they are present in the text or
+are explicitly labeled as design assumptions. Full evidence rules and the rationalization
+table live in `style/evidence_discipline.md`.
 
-Truth rule: preserve the algorithm's actual semantics. Do not add stages, models,
-databases, metrics, or complexity claims unless they are present in the text or are
-explicitly labeled as design assumptions.
+**Source-style default**: an algorithm figure is a **horizontal pipeline** or a **circular
+loop** depending on iteration structure, with stage labels prominent and inputs/outputs/
+state shown explicitly. Decisions and feedback paths are marked with the conventions in
+`style/visual_system.md`. Cleaner and more procedural than a repo architecture diagram —
+no module boundaries, no external systems unless stated. If the algorithm belongs to a
+field with strong notation conventions (control systems block-diagram, ML training loop,
+quantum circuit, optimization with reward), consult `style/domain_hints.md` for that
+field's primitives and avoid-list.
 
 ---
 

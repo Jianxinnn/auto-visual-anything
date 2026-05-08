@@ -1,196 +1,111 @@
 ---
 name: figure-foundry
 description: >
-  FigureFoundry: use this skill when the user wants to turn a source artifact into a
-  publication-quality scientific figure plan, optimized image-generation prompt, or optional
-  editable HTML/SVG architecture schematic. Trigger for requests such as "make a main figure",
-  "generate a prompt for this paper/repo", "visualize this system", "draw the architecture",
-  "turn this into a diagram/poster", "map this repo", "paper figure prompt", or converting a
-  paper, GitHub repo, local codebase, diagram, algorithm, or system description into a beautiful
+  FigureFoundry: use when the user wants to turn a source artifact into a publication-quality
+  scientific figure plan, optimized image-generation prompt, or optional editable HTML/SVG
+  schematic. Trigger for "make a main figure", "generate a prompt for this paper/repo",
+  "visualize this system", "draw the architecture", "turn this into a diagram/poster",
+  "map this repo", "paper figure prompt", "生图", "绘图 prompt", or any request converting
+  a paper, GitHub repo, local codebase, diagram, algorithm, or system description into a
   scientific figure prompt package. Do not trigger for ordinary code review, debugging, or
   text-only architecture discussion unless the user asks for a visual/prompt output.
 ---
 
-# FigureFoundry Skill — Master Router
+# FigureFoundry — Source → Scientific Figure
 
-FigureFoundry turns technical source material into a truthful, beautiful scientific figure
-specification. Its default output is an optimized prompt package the user can paste into an
-image-generation tool. If the user asks for an editable deterministic artifact, use the
-HTML/SVG renderer instead.
+Turn technical material (code, paper, diagram, algorithm, or design request) into a
+truthful, publication-quality figure spec. Default output: an image-generation prompt
+package. Optional output: a self-contained HTML/SVG artifact when the user asks for
+deterministic editable vector output.
 
 ---
 
-## STEP 1 — INPUT DETECTION (MANDATORY FIRST STEP)
+## STEP 1 — CLASSIFY INPUT
 
-Before doing anything else, classify the input by reading it carefully. Collect all
-strong signals first; do not stop at the first match.
+Score every strong signal before routing. If two or more types score, route HYBRID;
+do not collapse mixed input to the first signal.
 
-### Input Type Matrix
+| Type | Strong signals | Sub-skill |
+|------|----------------|-----------|
+| **CODE_REPO** | repo path, manifests (`package.json`, `pyproject.toml`, `Cargo.toml`...), file tree, source syntax (`import`, `class`, `def`) | `skills/repo_analyzer.md` |
+| **RESEARCH_PAPER** | PDF, abstract/method/results sections, "Figure 1", DOI/arXiv, "we propose / we evaluate" | `skills/paper_to_poster.md` |
+| **DIAGRAM_IMAGE** | image/SVG/screenshot with boxes, arrows, nodes, swimlanes | `skills/diagram_to_draft.md` |
+| **ALGO_TEXT** | numbered steps, pseudocode, stage-by-stage prose, no source-code syntax | `skills/algo_to_draft.md` |
+| **HYBRID** | ≥ 2 strong types above | `skills/hybrid.md` |
+| **DESIGN_REQUEST** | new design ask, no reference material | `skills/design_from_scratch.md` |
 
-| Signal | Detected Type | Route To |
-|--------|--------------|----------|
-| File tree / directory listing / `import` statements / source code | **CODE_REPO** | `skills/repo_analyzer.md` |
-| PDF upload / research paper / academic document | **RESEARCH_PAPER** | `skills/paper_to_poster.md` |
-| Image of a diagram / flowchart / architecture screenshot | **DIAGRAM_IMAGE** | `skills/diagram_to_draft.md` |
-| Text description of an algorithm / pseudocode / bullet-point spec | **ALGO_TEXT** | `skills/algo_to_draft.md` |
-| Mixed: code + description, or repo + paper | **HYBRID** | `skills/hybrid.md` |
-| Explicit request for new system design with no reference input | **DESIGN_REQUEST** | `skills/design_from_scratch.md` |
-
-### Detection Rules
-
-```
-Set detected_types = []
-
-IF (input contains a local repository path, file tree, package manifest, imports,
-    class/function definitions, or source files)
-  add CODE_REPO
-
-IF (input is a PDF/research paper, mentions abstract/figures/tables/citations,
-    or has academic-paper structure)
-  add RESEARCH_PAPER
-
-IF (input is an image/screenshot/SVG containing boxes, arrows, nodes, or a visible
-    technical figure)
-  add DIAGRAM_IMAGE
-
-IF (input is text describing an algorithm, pseudocode, numbered steps, stages,
-    data flow, or computational process without source-code syntax)
-  add ALGO_TEXT
-
-IF (user asks for a new architecture/system design and provides no reference material)
-  add DESIGN_REQUEST
-
-IF (detected_types contains 2 or more strong types)
-  → HYBRID
-ELSE IF (detected_types contains 1 type)
-  → that type
-ELSE IF (user asks for a visual architecture artifact but the source type is unclear)
-  → DESIGN_REQUEST
-ELSE
-  do not use this skill
-```
+If routing is ambiguous after scoring, see `router/intent_parser.md` for the full
+signal-scoring rules and ambiguous-case table. If the user does not want a visual
+or prompt artifact, do not use this skill.
 
 ---
 
 ## STEP 2 — TRUTHFULNESS CONTRACT
 
-Every output must distinguish evidence from inference.
+Every output distinguishes evidence from inference. **Read `style/evidence_discipline.md`
+before compiling.** It is the single source for the evidence ledger format, metric
+discipline, and the rationalization table.
 
-- Use concrete evidence from files, paper sections, diagram elements, or user-provided text.
-- If a number, dependency, module role, or result cannot be verified, mark it as `unknown`
-  or omit it. Never invent metrics to fill the visual.
-- For local repo work, cite the most important source files in the footer or findings.
-- For papers, include citation/source details if available.
-- For generated designs with no source material, label assumptions as design assumptions.
+Quick self-check — STOP if you catch yourself thinking:
+
+- "This number probably exists in the source."
+- "Marking unknown looks ugly; let me put a placeholder."
+- "User wants polish; rough estimates are fine."
+- "This dependency is so common it must be present."
+- "The diagram needs symmetry, so I'll add one more module."
+
+Each is a Contract violation. Mark `unknown`, omit the panel, or label as assumption.
+Full rationalization table in `style/evidence_discipline.md`.
 
 ---
 
 ## STEP 3 — SELECT OUTPUT TARGET
 
-Choose one output target:
-
 ```
 IF user asks for a prompt, image model, Midjourney, GPT image, Stable Diffusion,
-   "生图", "绘图 prompt", or wants to call another image tool themselves
-  → OUTPUT_TARGET = image_prompt
+   "生图", "绘图 prompt"
+  → image_prompt   (default)
 
-ELSE IF user asks for editable vector, HTML, SVG, deterministic labels, or a local artifact
-  → OUTPUT_TARGET = html_artifact
+ELSE IF user asks for editable HTML/SVG, deterministic labels, or a local artifact
+  → html_artifact
 
 ELSE
-  → OUTPUT_TARGET = image_prompt
+  → image_prompt
 ```
 
-Use `image_prompt` as the default because it is the most portable output and matches the
-common workflow: analyze source → plan figure → paste optimized prompt into a renderer.
-For dense scientific figures with many exact labels, include a post-edit note recommending
-that final labels be added in Figma, Illustrator, PowerPoint, or SVG.
-
-If the user asks to both create the FigureFoundry prompt and directly generate an image,
-use this two-stage workflow:
-
-1. Complete FigureFoundry analysis and compile the `image_prompt` package first.
-2. Extract only the final core image prompt plus recommended size/quality/format.
-3. Invoke the available image-generation skill/tool using its own documented configuration flow.
-4. Do not read, copy, transform, or mix API keys between tools.
-5. Do not override the image tool's configured API base or token unless the user explicitly asks.
-6. Report both the prompt package location/content summary and the generated image path.
-
-When handing off to `gen-images`, first run its `--show-config` preflight in the same shell
-environment that will run generation. If `GEN_IMAGES_API_KEY` is configured in `~/.zshrc`,
-source `~/.zshrc` in that same shell. Never inject Codex or Claude credentials into
-`GEN_IMAGES_API_KEY`; the image-generation skill owns its own runtime configuration.
+If the user wants both the prompt **and** a directly generated image, see
+`router/image_handoff.md` for the two-stage handoff and credential boundary rules.
 
 ---
 
-## STEP 4 — ANNOUNCE AND PROCEED
+## STEP 4 — EXECUTE
 
-After classifying, say ONE sentence to the user:
+1. Read `style/visual_system.md` (palette and diagram language) and
+   `style/evidence_discipline.md` (evidence rules). If the source has a strong domain
+   signal (paper venue, repo dependencies, diagram notation, algorithm field), also
+   read `style/domain_hints.md` for matching `Favor` primitives and `Avoid` items.
+2. Read the sub-skill from STEP 1.
+3. Run its phases; produce the structured content block.
+4. Read the chosen renderer:
+   - `renderers/image_prompt.md` (default)
+   - `renderers/html_artifact.md` (deterministic vector output)
+5. Compile the final output. The renderer is always the last step; never compile
+   before analysis is complete.
 
-> "I'm reading this as [TYPE] — compiling a [OUTPUT_TARGET] figure package now."
+State briefly to the user: *"Routing as [TYPE] → compiling [output_target]."*
+Ask at most one clarifying question, only if the missing detail would change the
+route or output type.
 
-Then read the relevant skill file and execute it. Ask at most one clarifying question only
-when the target output would otherwise be materially wrong.
-
----
-
-## STEP 5 — LOAD SUB-SKILL
-
-Read the appropriate file from `skills/`:
-
-- CODE_REPO → read `skills/repo_analyzer.md`
-- RESEARCH_PAPER → read `skills/paper_to_poster.md`
-- DIAGRAM_IMAGE → read `skills/diagram_to_draft.md`
-- ALGO_TEXT → read `skills/algo_to_draft.md`
-- HYBRID → read `skills/hybrid.md`
-- DESIGN_REQUEST → read `skills/design_from_scratch.md`
-
-All sub-skills share the same visual system. Read `style/visual_system.md` alongside the
-sub-skill, then read the selected renderer only when analysis is complete:
-
-- `renderers/image_prompt.md` for optimized prompt packages
-- `renderers/html_artifact.md` for deterministic HTML/SVG artifacts
-
----
-
-## STEP 6 — COMPILE OUTPUT
-
-All outputs use the renderer specified in `renderers/`. Default: `renderers/image_prompt.md`.
-
-The renderer is always the last step. Never compile a prompt or artifact before analysis is complete.
-
-For `image_prompt`, return the complete prompt package in the chat. For `html_artifact`, save
-the artifact as an HTML file in the current workspace when local filesystem access is available,
-unless the user requested a different destination.
-
-If direct image generation was requested, the prompt package still exists as the source of
-the generated image. Preserve it in the response or save it beside the image when practical.
+For `image_prompt`, return the full prompt package in chat. For `html_artifact`,
+save the file in the current workspace if local filesystem access exists, unless
+the user requested a different destination.
 
 ---
 
 ## Environment Notes
 
-**Chat environment**: Use uploaded PDFs, images, text, or zip contents directly. Do not
-claim local filesystem access unless the tool environment provides it.
+**Chat**: use uploaded PDFs, images, text, or zip contents directly. Do not claim
+local filesystem access unless the tool environment provides it.
 
-**Local coding environment**: Use fast file tools (`rg --files`, `rg`, package manifests,
-language-specific import scanners where available) to inspect repositories before invoking
-the sub-skill. Keep analysis scoped to source and configuration files; ignore dependency
-directories and generated build output.
-
----
-
-## Reference Files
-
-| File | Purpose | When to Read |
-|------|---------|--------------|
-| `router/intent_parser.md` | Extended routing and ambiguity rules | If detection is ambiguous |
-| `skills/repo_analyzer.md` | Code repo → architecture diagram | CODE_REPO input |
-| `skills/paper_to_poster.md` | Research paper → editorial poster | RESEARCH_PAPER input |
-| `skills/diagram_to_draft.md` | Diagram image → new architecture draft | DIAGRAM_IMAGE input |
-| `skills/algo_to_draft.md` | Algorithm text → architecture draft | ALGO_TEXT input |
-| `skills/hybrid.md` | Mixed input handler | HYBRID input |
-| `skills/design_from_scratch.md` | Pure design generation | DESIGN_REQUEST input |
-| `style/visual_system.md` | Shared visual design system | Always, before compiling output |
-| `renderers/image_prompt.md` | Image prompt package compiler | Default final step |
-| `renderers/html_artifact.md` | HTML/SVG artifact renderer spec | If editable/deterministic output requested |
+**Local coding**: use fast file tools (`rg --files`, `rg`, package manifests) to scope
+the repo. Skip `node_modules`, `.git`, `dist`, build output, generated files.

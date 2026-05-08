@@ -2,16 +2,21 @@
 
 **Trigger**: Input is source code, a file tree, a zip archive, or multiple code files.
 
-**Output**: Source-backed figure plan for a repo architecture diagram. Compile it into an
-optimized image prompt package by default, or an editable HTML/SVG artifact when requested.
+**Output**: Source-backed figure plan for a repo architecture diagram, passed to the renderer
+selected by the router (`renderers/image_prompt.md` by default).
 
-Read `style/visual_system.md` before executing this skill.
-After analysis, pass output to the selected renderer: `renderers/image_prompt.md` by default,
-or `renderers/html_artifact.md` for deterministic vector output.
+**Domain truth rule**: code is the source of truth. Do not infer frameworks, data stores,
+queues, or services unless they appear in files, manifests, imports, configuration, or
+user-provided context. Full evidence rules and the rationalization table live in
+`style/evidence_discipline.md`.
 
-Truth rule: code is the source of truth. Do not infer frameworks, data stores, queues,
-or services unless they appear in files, manifests, imports, configuration, or user-provided
-context. Mark uncertain items as `unknown` instead of inventing them.
+**Source-style default**: a code-repo figure is typically a **two-level architecture**
+(System Overview at high abstraction + Module Detail at directory/package level), laid
+out as a layered stack or swimlane, with data flow visible from entry points to external
+systems. Tone is functional and technical, not editorial. The footer cites concrete
+source paths and a confidence note. If the repo has a strong domain signal (ML training
+system, bioinformatics pipeline, security gateway), also consult `style/domain_hints.md`
+for the matching `Favor` primitives and `Avoid` items.
 
 ---
 

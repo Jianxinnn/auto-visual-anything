@@ -36,7 +36,8 @@ FigureFoundry/
 ├── assets/
 │   └── figurefoundry-simple-style.png
 ├── router/
-│   └── intent_parser.md        ← Extended classification rules
+│   ├── intent_parser.md        ← Extended classification rules
+│   └── image_handoff.md        ← Optional handoff to image-generation tools
 ├── skills/
 │   ├── paper_to_poster.md      ← Research paper → editorial poster
 │   ├── repo_analyzer.md        ← Code repo → architecture diagram
@@ -48,7 +49,9 @@ FigureFoundry/
 │   ├── image_prompt.md         ← Default prompt package compiler
 │   └── html_artifact.md        ← Optional HTML/SVG output engine
 └── style/
-    └── visual_system.md        ← Shared visual design system
+    ├── visual_system.md        ← Shared visual design system
+    ├── evidence_discipline.md  ← Shared evidence rules + rationalization table
+    └── domain_hints.md         ← Per-domain Favor / Avoid + universal anti-cliché
 ```
 
 ---
@@ -86,7 +89,8 @@ All outputs follow the **FigureFoundry editorial style**:
 ```
 Input → SKILL.md router → classifies input type
       → reads sub-skill from skills/
-      → reads style/visual_system.md
+      → reads style/visual_system.md + style/evidence_discipline.md
+      → reads style/domain_hints.md (when source has a strong domain signal)
       → assembles content
       → reads selected renderer
       → generates prompt package or optional HTML/SVG artifact
@@ -94,7 +98,10 @@ Input → SKILL.md router → classifies input type
 
 The router uses signal scoring (see `router/intent_parser.md` for full rules). It detects
 all strong input types first so mixed inputs route to `skills/hybrid.md` instead of being
-prematurely classified as a single source.
+prematurely classified as a single source. Evidence rules and the rationalization table
+that protect every output from fabrication live in `style/evidence_discipline.md`.
+Per-domain `Favor`/`Avoid` lists and the universal anti-cliché catalog live in
+`style/domain_hints.md`.
 
 ---
 

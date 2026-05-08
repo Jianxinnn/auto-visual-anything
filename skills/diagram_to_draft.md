@@ -3,17 +3,24 @@
 **Trigger**: Input is an image of an architecture diagram, flowchart, system map,
 ML pipeline figure, or any visual algorithm representation.
 
-**Output**: A figure redesign/transposition plan in the same structural style. Compile it
-into an optimized image prompt package by default, or an editable HTML/SVG artifact when
-requested. Not a copy — a genuine new design unless the user requested refinement.
+**Output**: A figure redesign/transposition plan in the same structural style, passed to
+the renderer selected by the router (`renderers/image_prompt.md` by default). Not a copy —
+a genuine new design unless the user requested refinement.
 
-Read `style/visual_system.md` before executing this skill.
-After analysis, pass output to the selected renderer: `renderers/image_prompt.md` by default,
-or `renderers/html_artifact.md` for deterministic vector output.
+**Domain truth rule**: separate what is visible in the image from what you infer. If
+labels or connections are unreadable, mark them as `unreadable` and ask for a clearer
+image only when the missing detail would materially change the output. Full evidence
+rules and the rationalization table live in `style/evidence_discipline.md`.
 
-Truth rule: separate what is visible in the image from what you infer. If labels or
-connections are unreadable, mark them as `unreadable` and ask for a clearer image only
-when the missing detail would materially change the output.
+**Source-style default**: this is the only sub-skill that **inherits the visual
+fingerprint from the input image** (box style, edge style, grouping method, naming
+convention, abstraction depth — see Phase 1.2). For `refine_existing`, preserve the
+original domain and meaning, only improve hierarchy, alignment, label priority, and
+visual emphasis. For `transpose_to_new_architecture`, keep the visual grammar and only
+swap the problem domain. Do not impose the FigureFoundry editorial palette over a
+clearly different source style; respect what the image is. If the new domain has a
+strong cliché list (e.g., transposing into ML / security / bio), consult
+`style/domain_hints.md` for the avoid items.
 
 ---
 

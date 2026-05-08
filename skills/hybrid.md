@@ -3,15 +3,21 @@
 **Trigger**: Input contains MULTIPLE types — e.g., code + paper, diagram + description,
 repo + algorithm spec, or any combination of the input types.
 
-**Output**: Unified figure plan combining all input sources. Compile it into an optimized
-image prompt package by default, or an editable HTML/SVG artifact when requested.
+**Output**: Unified figure plan combining all input sources, passed to the renderer
+selected by the router (`renderers/image_prompt.md` by default).
 
-Read `style/visual_system.md` before executing this skill.
-After analysis, pass output to the selected renderer: `renderers/image_prompt.md` by default,
-or `renderers/html_artifact.md` for deterministic vector output.
+**Domain truth rule**: keep sources separate until synthesis. Do not let an attractive
+diagram or paper claim override implementation evidence. Mark conflicts and unknowns
+explicitly. Use `[FROM CODE]`, `[FROM PAPER]`, `[FROM DIAGRAM]`, `[FROM TEXT]`,
+`[SYNTHESIZED]`, `[UNKNOWN]` tags as defined in `style/evidence_discipline.md`.
 
-Truth rule: keep sources separate until synthesis. Do not let an attractive diagram or
-paper claim override implementation evidence. Mark conflicts and unknowns explicitly.
+**Source-style default**: a hybrid figure makes **source authority visible**. Every
+claim carries its origin tag. Conflicts are not smoothed into a single confident
+diagram — when the paper says X and the code says Y, both appear, with the resolution
+shown. Composition follows the **dominant input's** source-type default (e.g., paper +
+code → paper-style hero mechanism diagram with a `FROM CODE` evidence panel). If the
+combined source has a strong domain signal, consult `style/domain_hints.md` and merge
+the `Avoid` lists from each matching row.
 
 ---
 

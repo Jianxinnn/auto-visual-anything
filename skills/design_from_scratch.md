@@ -3,17 +3,23 @@
 **Trigger**: User requests a new system/algorithm design with no reference input.
 e.g., "Design me a recommendation system", "Create an architecture for X", "How would you build Y?"
 
-**Output**: Complete original architecture figure plan in the FigureFoundry editorial style.
-Compile it into an optimized image prompt package by default, or an editable HTML/SVG artifact
-when requested.
+**Output**: Complete original architecture figure plan in the FigureFoundry editorial
+style, passed to the renderer selected by the router (`renderers/image_prompt.md` by
+default).
 
-Read `style/visual_system.md` before executing this skill.
-After analysis, pass output to the selected renderer: `renderers/image_prompt.md` by default,
-or `renderers/html_artifact.md` for deterministic vector output.
+**Domain truth rule**: because there is no reference input, all unstated scale, latency,
+data, and deployment choices are design assumptions. Make the architecture opinionated,
+but label assumptions clearly and avoid pretending they came from the user. The footer
+must state "design assumptions" explicitly. Full evidence rules and the rationalization
+table live in `style/evidence_discipline.md`.
 
-Design rule: because there is no reference input, all unstated scale, latency, data,
-and deployment choices are design assumptions. Make the architecture opinionated, but
-label assumptions clearly and avoid pretending they came from the user.
+**Source-style default**: a from-scratch design figure has three things a real-source
+figure does not — an explicit **design-assumptions panel**, a **decision-rationale
+panel**, and a **V1 → V2 → V3 extension roadmap**. Footer must read "design
+assumptions" so readers do not mistake an opinion for an analyzed fact. Composition is
+opinionated but never decorative. If the user named a domain (recommendation system,
+trading platform, lab automation, robotics), consult `style/domain_hints.md` for the
+field's primitives and avoid-list before compiling.
 
 ---
 

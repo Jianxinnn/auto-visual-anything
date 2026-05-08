@@ -3,16 +3,22 @@
 **Trigger**: Input is a PDF, academic paper, or research document.
 
 **Output**: Source-backed scientific figure plan for a graphical abstract, main figure,
-or A1-style infographic poster. Compile it into an optimized image prompt package by
-default, or an editable HTML/SVG artifact when requested.
+or A1-style infographic poster, passed to the renderer selected by the router
+(`renderers/image_prompt.md` by default).
 
-Read `style/visual_system.md` before executing this skill.
-After analysis, pass output to the selected renderer: `renderers/image_prompt.md` by default,
-or `renderers/html_artifact.md` for deterministic vector output.
+**Domain truth rule**: never invent results, baselines, authors, venues, datasets, or
+citations. If a metric is not visible in the provided paper content, use a qualitative
+insight or mark the value as `unknown`. Full evidence rules and the rationalization table
+live in `style/evidence_discipline.md`.
 
-Truth rule: never invent results, baselines, authors, venues, datasets, or citations.
-If a metric is not visible in the provided paper content, use a qualitative insight or
-mark the value as `unknown`.
+**Source-style default**: a paper figure is either a **graphical abstract** or an
+**A1 multi-panel poster** following a Question → Mechanism → Evidence narrative arc.
+Typical composition: one hero mechanism diagram + 1–2 reproduced result charts, each
+with direct labeling and no legends. Citation footer is mandatory. Tone is editorial —
+the figure must make a claim, not just diagram a system. If the paper has a strong
+domain signal (structural biology, chemistry mechanism, ML architecture, neuroscience),
+consult `style/domain_hints.md` to load the field's idiomatic primitives and anti-cliché
+list before compiling.
 
 ---
 

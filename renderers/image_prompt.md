@@ -60,7 +60,24 @@ Visual style:
 [Vector style, typography, line weight, icon rules, whitespace, what should feel premium.]
 
 ## 6. Negative Prompt
-[What to avoid: visual cliches, inaccurate elements, clutter, bad typography, cartoons, etc.]
+
+Compose the negative prompt as TWO blocks — universal first, domain-specific second.
+The full lists live in `style/domain_hints.md`; do not restate them here, copy from there.
+
+**Universal anti-cliché** (always include):
+- cartoon robots, anthropomorphic AI brains, "intelligence" glow halos
+- glowing sci-fi dashboards, neon HUDs, cyberpunk grids
+- generic cloud icons used as decoration
+- DNA double-helix as background filler
+- hooded hackers, matrix rain, lock-icon piles
+- fake LaTeX or garbled scientific symbols
+- 3D pie charts, decorative gauge dials
+- collage / scrapbook layouts, stock-photo overlays, lens flares
+
+**Domain anti-cliché** (pull from `style/domain_hints.md` row matching this figure's domain):
+- [merge the matched row's `Avoid` list here verbatim]
+- [if the source crosses domains, merge `Avoid` lists from all matching rows]
+- [if no domain row clearly fits, omit this block]
 
 ## 7. Recommended Generation Settings
 - Aspect ratio:
@@ -155,21 +172,14 @@ Avoid:
 ### Select Palette Semantically
 
 Choose a palette from `style/visual_system.md` based on the source domain and the figure's
-main claim. Do not default to black/cyan for every project.
+main claim. Do not default to black/cyan for every project. The palette table (sci-light,
+bio-evidence, systems-blue, data-violet, security-amber, product-muted) and full color
+roles live in `style/visual_system.md`; do not restate them here.
 
-Common choices:
-
-- `sci-light`: general scientific software, algorithms, repo architecture.
-- `bio-evidence`: biology, protein design, wet-lab, evidence/provenance workflows.
-- `systems-blue`: infrastructure, developer tools, pipelines, agents.
-- `data-violet`: analytics, evaluation, benchmarks, knowledge graphs.
-- `security-amber`: verification, safety, compliance, threat/risk models.
-- `product-muted`: product/system explainers that need a polished but restrained look.
-
-Every prompt must specify color semantics:
+Every prompt must specify color semantics in this exact shape:
 
 ```text
-Use [palette] because [rationale].
+Use [palette] because [rationale tied to source domain or main claim].
 Use dark slate only for the single central orchestrator, if needed.
 Use light boxes for normal deterministic modules.
 Use [accent] for the main path.

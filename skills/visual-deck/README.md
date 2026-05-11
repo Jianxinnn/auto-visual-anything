@@ -20,15 +20,18 @@
 ```
 input ──► [visual-deck] triage  (pick style, length, size)
               │
-              ├── source / paper / repo  ──► visual-plan ──► outline
+              ├── source / paper / repo  ──► visual-plan evidence ──► content brief
               │
-              └── topic-only / outline   ───────────────────►  outline
+              └── topic-only / outline   ───────────────────►  content brief
                                                                   │
                               ┌───────────────────────────────────┘
                               ▼
+                  [visual-deck] outline: slide list + provenance
+                              │
+                              ▼
                   [visual-deck] render: per slide compile prompt
                               │
-                              ▼  (one visual-gen call per slide)
+                              ▼  (4 parallel visual-gen calls by default)
                        visual-gen ──► slides/slide-NN.png
                               │
                               ▼
@@ -68,7 +71,8 @@ See `references/slide-roles.md` for the full taxonomy.
 ```
 <task_cwd>/.visual-deck/<YYYYMMDD-HHMMSS>/
 ├── outline.md             # the deck outline (yaml in md)
-├── last_run.json          # {style, size, count, slides[], outline, ts}
+├── deck_content_brief.md  # content claims, unknowns, and provenance
+├── last_run.json          # {style, size, count, render_mode, max_concurrency, slides[], outline, ts}
 ├── prompts/slide-NN.md    # compiled per-slide prompt (style preamble + slide block)
 ├── slides/slide-NN.png    # the rendered slide images
 └── revisions.log          # one line per render / revision attempt
@@ -80,6 +84,8 @@ See `references/slide-roles.md` for the full taxonomy.
 visual-deck/
 ├── SKILL.md                          # orchestration rules (triage / outline / render / iterate)
 ├── README.md                         # this file
+├── scripts/
+│   └── render_slides.py              # parallel renderer; delegates each slide to visual-gen
 ├── styles/
 │   ├── _shared.md                    # universal hard constraints (B-mode budget, anti-AI tells)
 │   ├── academic-discussion.md
@@ -93,8 +99,10 @@ visual-deck/
     └── outline-schema.md
 ```
 
-No scripts, no credentials, no new dependencies. Everything routes through `visual-gen`
-for image generation and (when source material exists) `visual-plan` for outline drafting.
+No credentials and no new dependencies. Image generation still routes through `visual-gen`;
+`scripts/render_slides.py` only schedules the per-slide calls in parallel, defaulting to
+`--jobs 4`. `visual-plan` is used only as a source-grounded evidence helper when source
+material exists. `visual-deck` owns the deck content brief and outline.
 
 ## Why a separate skill
 
@@ -112,5 +120,7 @@ for image generation and (when source material exists) `visual-plan` for outline
 - It does not bake long paragraphs / data tables / code blocks into images — gpt-image-2's
   text rendering breaks down beyond a short title plus 1–2 captions. The B-mode budget is
   intentional.
-- It does not invent slide content from thin air when you supply source material — that
-  job is delegated to `visual-plan`, which carries an evidence ledger.
+- It does not turn a single-figure prompt package directly into slides. Source material
+  first becomes a `deck_content_brief.md`, then an outline.
+- It does not present topic-only decks as factual reports. Topic-only output is a concept
+  draft unless the user supplies sources.

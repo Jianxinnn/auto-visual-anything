@@ -3,6 +3,13 @@
 Auto Visual Anything is a suite of installable agent skills for source-grounded figure
 planning, image generation, and slide-image generation.
 
+## Visual Overview
+
+| | | |
+| --- | --- | --- |
+| ![Auto Visual Anything](assets/readme-deck/slide-01.png) | ![Skill Suite](assets/readme-deck/slide-02.png) | ![Plan](assets/readme-deck/slide-03.png) |
+| ![Generate](assets/readme-deck/slide-04.png) | ![Deck](assets/readme-deck/slide-05.png) | ![Install](assets/readme-deck/slide-06.png) |
+
 ## Skills
 
 | Skill | Role | Install unit |

@@ -6,6 +6,7 @@ Markdown wrapper with these top-level keys:
 - `title`
 - `style`
 - `size`
+- `content_mode`
 - `slides`
 
 Each slide has:
@@ -13,6 +14,7 @@ Each slide has:
 - `role`
 - `title`
 - `captions`
+- `source_refs`
 
 Supported roles:
 
@@ -21,5 +23,12 @@ Supported roles:
 - `content`
 - `closing`
 
-`visual-deck` may derive an outline from a `visual-plan` prompt package, but
-it must preserve the evidence/unknown distinction from the planning layer.
+`source_refs` is provenance metadata and must not be rendered into the slide image.
+
+`visual-deck` should not derive an outline directly from a `visual-plan` prompt package.
+For source-backed decks, it first creates `deck_content_brief.md` with allowed claims,
+unknowns, and narrative beats. The outline is derived from that brief.
+
+Topic-only decks are concept drafts. They must use `source_refs:
+["assumption:topic-only"]` for generated content and avoid factual specifics unless the
+user supplies sources.

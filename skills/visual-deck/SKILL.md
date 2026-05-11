@@ -5,8 +5,8 @@ description: >
   slide, with a title and ≤2 short captions baked into the image). Triggers: "做一组 PPT
   风格的图", "出一套幻灯片图片", "学术汇报封面/章节页", "literature review slide deck",
   "把这篇 paper / repo 做成 deck 图", "工作汇报海报", "商业介绍 cover slide", "/visual-deck",
-  or any request asking for "slide-style images" / "幻灯片图片". Orchestrates visual-plan
-  (source → outline) and visual-gen (image generation) with a chosen style template.
+  or any request asking for "slide-style images" / "幻灯片图片". Builds a deck-specific
+  content brief and outline, then uses visual-gen for image generation.
   Persists run state under <task_cwd>/.visual-deck/<run-id>/. Do NOT trigger if the user
   wants a real editable .pptx (use the `pptx` skill) or one figure (use visual-anything / -plan / -gen).
 argument-hint: <topic | source path | outline + 可选 style 名>
@@ -23,7 +23,7 @@ Use it when you want all three of:
 
 1. A coherent multi-slide visual narrative (cover → sections → content → closing)
 2. Real image generation for each slide (delegated to **visual-gen**)
-3. Optional source-grounded outline drafting (delegated to **visual-plan**)
+3. A deck-specific content brief before rendering, so slide content is not improvised
 
 If the user wants ONE figure, use `visual-anything`. If they want an editable `.pptx`, use the
 `pptx` skill — `visual-deck` produces images, not `.pptx`.
@@ -39,17 +39,21 @@ INPUT  (source / topic / outline + optional style)
 [STEP 1] Triage    → pick style + decide deck length + pick size
   │
   ▼
-[STEP 2] Outline   → produce slide list { role, title, captions[] }
-  │                   - source material  → delegate to visual-plan
+[STEP 2] Content   → produce deck_content_brief.md
+  │                   - source material  → use visual-plan for evidence extraction only
   │                   - outline supplied → use verbatim (validate)
-  │                   - topic only       → orchestrator drafts a 6-slide skeleton
+  │                   - topic only       → concept draft, no factual specifics
   ▼
-[STEP 3] Render    → for each slide:
+[STEP 3] Outline   → produce slide list { role, title, captions[], source_refs[] }
+  │                   every rendered title/caption must be backed by a source_ref,
+  │                   user outline, or explicit assumption
+  ▼
+[STEP 4] Render    → for each slide:
   │                   compile prompt = styles/_shared.md + styles/<style>.md + slide block
-  │                   delegate to visual-gen → slides/slide-NN.png
+  │                   render compiled prompts in parallel via visual-gen → slides/slide-NN.png
   ▼
-[STEP 4] Iterate   → cosmetic / content / restyle / restructure
-                     route back to STEP 3 (or STEP 2 for restructure)
+[STEP 5] Iterate   → cosmetic / content / restyle / restructure
+                     route back to STEP 4 (or STEP 2/3 for content changes)
 ```
 
 ---
@@ -73,9 +77,9 @@ Decide four things before producing anything:
    Whatever you pick, the SAME size MUST apply to every slide of the run (visual consistency).
 
 4. **input mode** —
-   - source material present (paper / repo / code / diagram / pasted long text) → STEP 2 delegates to `visual-plan`
-   - outline supplied (user pastes a yaml/list) → STEP 2 validates and uses verbatim
-   - topic only (one phrase like "Make a deck about diffusion models") → STEP 2 drafts inline
+   - source material present (paper / repo / code / diagram / pasted long text) → STEP 2 builds a sourced content brief
+   - outline supplied (user pastes a yaml/list) → STEP 2 validates and uses it as user-authored content
+   - topic only (one phrase like "Make a deck about diffusion models") → STEP 2 drafts conceptual content only
 
 Source-material detectors are the same as in `visual-anything` (paths, URLs, ≥ 5 line code blocks,
 structured algorithm prose). When ambiguous after one pass, ask exactly one disambiguation
@@ -83,51 +87,106 @@ question.
 
 ---
 
-## STEP 2 — Outline
+## STEP 2 — Content brief
 
-Goal: produce a valid `outline.md` that conforms to `references/outline-schema.md`.
+Goal: produce `<task_cwd>/.visual-deck/<run-id>/deck_content_brief.md` before any
+slide image prompts are compiled.
+
+The content brief is the guardrail that prevents pretty but empty decks. Use this
+shape:
+
+```markdown
+# Deck Content Brief
+
+- input_mode: source | outline | topic
+- audience: <inferred or user-provided>
+- deck_goal: <one sentence>
+
+## Allowed Claims
+- <claim> | source_ref=<path/section/user-outline/assumption>
+
+## Unknowns
+- <important missing facts>
+
+## Narrative Arc
+- cover: <literal title idea>
+- sections: <1-3 section labels>
+- content beats: <one evidence-supported point per content slide>
+```
 
 ### Source-material branch
 
-Delegate to `visual-plan` with the source. Take the resulting Prompt Package's evidence
-ledger and narrative arc; convert it into a slide list. Rules:
+Use `visual-plan` to inspect the source and produce source-grounded facts,
+evidence, assumptions, and unknowns. Do **not** treat visual-plan's Prompt
+Package as a deck outline. A single-figure prompt package is only an evidence
+input; the deck outline must be derived from the deck content brief.
 
-- ONE `cover` first (deck title from the source's main claim).
-- 1–2 `section` dividers reflecting the source's top-level structure (do NOT invent headings the source does not support).
-- `content` slides each carrying ONE evidence-supported point. Title = the point in ≤10 EN words / ≤8 CN chars. Captions = up to 2 quantified specifics from the ledger.
-- ONE `closing` last.
-- If the Prompt Package marked `unknown` in critical positions, flag them in the captions as
-  `(needs verification)` rather than fabricating numbers. The Truthfulness Contract that
-  lives in visual-plan extends to every caption baked into a slide.
+Rules:
+
+- Every allowed claim must come from the source, visual-plan evidence ledger, or
+  user-provided text.
+- If the source does not support enough distinct content beats, reduce the deck
+  length instead of padding with generic slides.
+- If more than two intended content slides have only unknowns, stop and ask for
+  more source material or permission to make a concept-only deck.
+- Do not invent section headings just to make the deck feel balanced.
 
 ### Outline-supplied branch
 
-Validate against `references/outline-schema.md`. If a title or caption exceeds the length
+Validate against `references/outline-schema.md`. Treat user-authored titles and
+captions as `source_ref=user-outline`. If a title or caption exceeds the length
 budget, ask one question only — never silently truncate user-authored text.
 
 ### Topic-only branch
 
-Orchestrator drafts a 6-slide skeleton inline (no visual-plan call). The default skeleton:
+Draft a concept deck, not a factual report. Use broad, non-quantified framing and
+set `source_ref=assumption:topic-only` for every generated title/caption.
 
-```yaml
-- {role: cover,    title: "<topic>",            captions: ["<one-line subtitle>"]}
-- {role: section,  title: "Background",         captions: []}
-- {role: content,  title: "<sub-point 1>",      captions: ["<short>", "<short>"]}
-- {role: content,  title: "<sub-point 2>",      captions: ["<short>", "<short>"]}
-- {role: content,  title: "<sub-point 3>",      captions: ["<short>", "<short>"]}
-- {role: closing,  title: "Discussion",         captions: ["Q & A"]}
-```
+Topic-only decks must not include:
 
-Save the result to `<task_cwd>/.visual-deck/<run-id>/outline.md`. Stop and ask the user
-before STEP 3 if **any** of:
+- numeric claims, benchmark values, dates, citations, or named paper results
+- claims about a specific repo, paper, company, product, person, or dataset
+- "industry standard" or "state of the art" assertions
 
-- length > 12 (cost guard) — confirm explicit opt-in
-- a title violates length budget after auto-shortening attempt
-- the source branch produced > 2 slides whose captions all read `(needs verification)`
+If the user asks for any of those, ask for source material or route to a real
+research / citation workflow before rendering.
 
 ---
 
-## STEP 3 — Render
+## STEP 3 — Outline
+
+Goal: produce a valid `outline.md` that conforms to `references/outline-schema.md`.
+
+Build the outline from the content brief:
+
+- ONE `cover` first (deck title from the brief's deck goal).
+- 1–2 `section` dividers only if they match the brief's narrative arc.
+- `content` slides each carry ONE content beat. Title = the point in ≤10 EN words / ≤8 CN chars. Captions = up to 2 specifics from the brief.
+- ONE `closing` last.
+- Every slide has `source_refs`. These are non-rendered provenance notes used for
+  validation and revision; do not ask visual-gen to draw them.
+- If a content beat is unsupported, either mark the slide with
+  `source_refs: ["needs verification"]` and ask before rendering, or remove the slide.
+
+```yaml
+- role: content
+  title: "<short point>"
+  captions:
+    - "<short evidence or concept caption>"
+  source_refs:
+    - "<file/section/user-outline/assumption>"
+```
+
+Save the result to `<task_cwd>/.visual-deck/<run-id>/outline.md`. Stop and ask the user
+before STEP 4 if **any** of:
+
+- length > 12 (cost guard) — confirm explicit opt-in
+- a title violates length budget after auto-shortening attempt
+- any source-backed content slide has `source_refs: ["needs verification"]`
+
+---
+
+## STEP 4 — Render
 
 For each slide in the outline, in order:
 
@@ -145,13 +204,25 @@ For each slide in the outline, in order:
      - captions:
        - "<caption 1>"   # if any
        - "<caption 2>"   # if any
+     - source_refs: ["..."]  # provenance only; DO NOT render
      - section_number: "01"  # only when role == section, zero-padded
      ```
 
 2. Save the compiled prompt to `<task_cwd>/.visual-deck/<run-id>/prompts/slide-NN.md`.
 
-3. Delegate to **visual-gen** with these arguments (always go through the `visual-gen`
-   skill — never call `scripts/visual_gen.py` directly):
+3. After all prompts are saved, render them with the bundled runner:
+
+   ```bash
+   python <visual-deck>/scripts/render_slides.py \
+     --run-dir <task_cwd>/.visual-deck/<run-id> \
+     --jobs 4
+   ```
+
+   Default render mode is parallel with `--jobs 4`. Lower it only when the image API is
+   rate-limited or the user asks for serial generation. The runner delegates to the sibling
+   **visual-gen** CLI for each slide; it never calls the image API directly.
+
+4. The runner calls **visual-gen** once per prompt with these arguments:
 
    | Field | Value |
    |---|---|
@@ -162,12 +233,11 @@ For each slide in the outline, in order:
    | `--out-dir` | `<task_cwd>/.visual-deck/<run-id>/slides/` |
    | `--n` | `1` |
 
-4. After visual-gen returns its file path, rename / move the file to
-   `slides/slide-NN.png` (zero-padded NN). Keep the original visual-gen run metadata
-   intact in its own subfolder if it created one — do not delete it.
+5. After visual-gen returns each file path, the runner renames / moves it to
+   `slides/slide-NN.png` (zero-padded NN).
 
-5. Append one line to `revisions.log`:
-   `<ts> render slide-NN role=<role> style=<style> ok=<true|false>`
+6. The runner appends one line per slide to `revisions.log`:
+   `<ts> render slide-NN role=<role> style=<style> ok=<true|false> mode=parallel jobs=4`
 
 If visual-gen's `--show-config` preflight fails, surface the error verbatim and STOP.
 Do not fabricate, retry with substituted credentials, or partially generate the deck.
@@ -185,6 +255,8 @@ with shape:
   "style": "<style>",
   "size": "<size>",
   "count": N,
+  "render_mode": "parallel",
+  "max_concurrency": 4,
   "slides": ["slides/slide-01.png", "..."],
   "outline": "outline.md",
   "ts": "<ISO timestamp>"
@@ -193,14 +265,14 @@ with shape:
 
 ---
 
-## STEP 4 — Iterate
+## STEP 5 — Iterate
 
 Most decks need at least one revision pass. Classify the user's revision:
 
 | Type | Example | Route |
 |---|---|---|
 | **Cosmetic** | "slide 3 更亮", "重出第 5 张,更冷色" | re-call visual-gen for that slide ONLY; reuse compiled prompt |
-| **Content** | "把 slide 5 标题改成 X", "caption 改一下" | edit `outline.md` for that slide → recompile prompt → re-call gen for that slide |
+| **Content** | "把 slide 5 标题改成 X", "caption 改一下" | edit `deck_content_brief.md` if the claim changes → update `outline.md` → recompile prompt → re-call gen for that slide |
 | **Restyle** | "整套换成 literature-review 风格" | change `style` in `outline.md` → recompile ALL prompts → regenerate ALL slides |
 | **Restructure** | "合并 slide 4 和 5", "再加一页讲 ablation" | edit `outline.md` (insert/delete/merge) → recompile and regenerate the AFFECTED slides only; renumber following slides |
 
@@ -217,7 +289,8 @@ Each run lives under `<task_cwd>/.visual-deck/<run-id>/`:
 
 ```
 outline.md             ← canonical deck outline (yaml in markdown wrapper)
-last_run.json          ← {style, size, count, slides[], outline, ts}
+deck_content_brief.md  ← content claims, unknowns, and provenance
+last_run.json          ← {style, size, count, render_mode, max_concurrency, slides[], outline, ts}
 prompts/
   slide-01.md          ← compiled prompt for slide 1
   slide-NN.md
@@ -235,7 +308,8 @@ run. Revisions stay inside the most recent run unless the user explicitly says "
 ## Boundaries
 
 - Do NOT reimplement what the sub-skills do. No inline `gpt-image-2` calls. No inline
-  source classification. Always invoke the sub-skill through its public entry.
+  source classification. Use `scripts/render_slides.py` for deck rendering; it delegates
+  each slide to the sibling `visual-gen` CLI.
 - API credentials live in `visual-gen` alone. `visual-deck` never reads, copies,
   prints, or transforms tokens. Never inject Codex- or Claude-side credentials.
 - Do NOT request more than 12 slides per run without explicit user opt-in. (Each slide is
@@ -245,8 +319,10 @@ run. Revisions stay inside the most recent run unless the user explicitly says "
   `.pptx` via the separate `pptx` skill.
 - Do NOT change the chosen style's 5 anchors mid-deck. Visual consistency is the whole
   point of using a fixed style template.
-- Do NOT bypass visual-plan when the user supplied source material. Hand-rolling slide
-  content from a paper risks the same hallucination visual-plan was built to prevent.
+- Do NOT bypass the content brief. Rendering directly from a topic or a visual-plan
+  Prompt Package is how generic or fabricated decks happen.
+- Do NOT present topic-only decks as source-grounded. They are concept drafts unless
+  the user supplies sources.
 
 ---
 

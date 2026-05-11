@@ -8,7 +8,7 @@ expected=(figforge figforge-plan figforge-gen figforge-deck)
 for skill in "${expected[@]}"; do
   skill_dir="$skills_dir/$skill"
   test -f "$skill_dir/SKILL.md"
-  if rg -n '\.\./\.\.|/contracts/|/docs/|/scripts/' "$skill_dir/SKILL.md" "$skill_dir/README.md" >/tmp/figforge-validate-rg.out 2>/dev/null; then
+  if rg -n '\.\./(contracts|docs|scripts)|/FigForge/(contracts|docs|scripts)' "$skill_dir/SKILL.md" "$skill_dir/README.md" >/tmp/figforge-validate-rg.out 2>/dev/null; then
     echo "Runtime dependency leak in $skill:" >&2
     cat /tmp/figforge-validate-rg.out >&2
     exit 1

@@ -1,0 +1,6 @@
+.figforge-deck/
+*.png
+*.jpg
+*.jpeg
+*.webp
+.DS_Store

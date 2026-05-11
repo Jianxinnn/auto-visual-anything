@@ -1,0 +1,12 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Runtime outputs created by the installed skills.
+.figforge/
+.figforge-deck/
+figforge-gen/
+
+# Local migration backups created outside the suite repo are not source.
+.migration-backups/

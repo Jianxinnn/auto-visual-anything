@@ -1,4 +1,5 @@
 import importlib.util
+import re
 from pathlib import Path
 
 
@@ -33,3 +34,18 @@ def test_lone_legacy_figforge_api_key_env_does_not_block_fallback(monkeypatch):
     args = type("Args", (), {"api_base": None, "api_key": None, "api_key_env": None})()
 
     assert visual_gen.load_direct_settings(args, {}, None, "gpt-image-2") is None
+
+
+def test_default_output_dir_uses_unified_runtime_root(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+
+    output_dir = visual_gen.resolve_output_dir(None)
+
+    assert output_dir.parent == tmp_path / ".visual-anything" / "runs" / "gen"
+    assert re.fullmatch(r"\d{8}-\d{6}", output_dir.name)
+
+
+def test_relative_output_dir_is_still_resolved_from_cwd(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+
+    assert visual_gen.resolve_output_dir("custom-out") == tmp_path / "custom-out"

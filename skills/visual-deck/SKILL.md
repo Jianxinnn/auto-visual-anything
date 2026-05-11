@@ -8,7 +8,7 @@ description: >
   or any request asking for "slide-style images" / "幻灯片图片". Builds a deck-specific
   content brief, outline, and per-slide generation specs, then uses visual-gen / image2
   for direct image generation.
-  Persists run state under <task_cwd>/.visual-deck/<run-id>/. Do NOT trigger if the user
+  Persists run state under <task_cwd>/.visual-anything/runs/deck/<run-id>/. Do NOT trigger if the user
   wants a real editable .pptx (use the `pptx` skill) or one figure (use visual-anything / -plan / -gen).
 argument-hint: <topic | source path | outline + 可选 style 名>
 allowed-tools: [Bash, Read, Write, Edit]
@@ -99,7 +99,7 @@ question.
 
 ## STEP 2 — Content brief
 
-Goal: produce `<task_cwd>/.visual-deck/<run-id>/deck_content_brief.md` before any
+Goal: produce `<task_cwd>/.visual-anything/runs/deck/<run-id>/deck_content_brief.md` before any
 slide image prompts are compiled.
 
 The content brief is the guardrail that prevents pretty but empty decks. Use this
@@ -187,7 +187,7 @@ Build the outline from the content brief:
     - "<file/section/user-outline/assumption>"
 ```
 
-Save the result to `<task_cwd>/.visual-deck/<run-id>/outline.md`. Stop and ask the user
+Save the result to `<task_cwd>/.visual-anything/runs/deck/<run-id>/outline.md`. Stop and ask the user
 before STEP 4 if **any** of:
 
 - length > 12 (cost guard) — confirm explicit opt-in
@@ -198,7 +198,7 @@ before STEP 4 if **any** of:
 
 ## STEP 4 — Generation specs
 
-Goal: produce `<task_cwd>/.visual-deck/<run-id>/slide_generation_specs/slide-NN.md`
+Goal: produce `<task_cwd>/.visual-anything/runs/deck/<run-id>/slide_generation_specs/slide-NN.md`
 before compiling image prompts.
 
 Read `references/slide-generation-spec.md`. Each spec should contain:
@@ -244,14 +244,14 @@ For each slide in the outline, in order:
      - section_number: "01"  # only when role == section, zero-padded
      ```
 
-2. Save the compiled prompt to `<task_cwd>/.visual-deck/<run-id>/prompts/slide-NN.md`.
+2. Save the compiled prompt to `<task_cwd>/.visual-anything/runs/deck/<run-id>/prompts/slide-NN.md`.
    The prompt should contain concrete scene grammar, not only title/captions.
 
 3. After all prompts are saved, render them with the bundled runner:
 
    ```bash
    python <visual-deck>/scripts/render_slides.py \
-     --run-dir <task_cwd>/.visual-deck/<run-id> \
+     --run-dir <task_cwd>/.visual-anything/runs/deck/<run-id> \
      --jobs 4
    ```
 
@@ -267,7 +267,7 @@ For each slide in the outline, in order:
    | `--size` | the size chosen in STEP 1 (constant across the deck) |
    | `--quality` | `high` |
    | `--output-format` | `png` |
-   | `--out-dir` | `<task_cwd>/.visual-deck/<run-id>/slides/` |
+   | `--out-dir` | `<task_cwd>/.visual-anything/runs/deck/<run-id>/slides/` |
    | `--n` | `1` |
 
 5. After visual-gen returns each file path, the runner renames / moves it to
@@ -282,7 +282,7 @@ Do not fabricate, retry with substituted credentials, or partially generate the 
 When ALL slides succeed, save run summary:
 
 ```
-<task_cwd>/.visual-deck/<run-id>/last_run.json
+<task_cwd>/.visual-anything/runs/deck/<run-id>/last_run.json
 ```
 
 with shape:
@@ -322,7 +322,7 @@ silently pick a route.
 
 ## State
 
-Each run lives under `<task_cwd>/.visual-deck/<run-id>/`:
+Each run lives under `<task_cwd>/.visual-anything/runs/deck/<run-id>/`:
 
 ```
 outline.md             ← canonical deck outline (yaml in markdown wrapper)
@@ -373,10 +373,10 @@ After STEP 5 succeeds:
 
 ```text
 共生成 N 张幻灯片图像 (style=<style>, size=<size>):
-  <task_cwd>/.visual-deck/<run-id>/slides/slide-01.png
-  <task_cwd>/.visual-deck/<run-id>/slides/slide-02.png
+  <task_cwd>/.visual-anything/runs/deck/<run-id>/slides/slide-01.png
+  <task_cwd>/.visual-anything/runs/deck/<run-id>/slides/slide-02.png
   ...
-大纲: <task_cwd>/.visual-deck/<run-id>/outline.md
+大纲: <task_cwd>/.visual-anything/runs/deck/<run-id>/outline.md
 ```
 
 For revisions, briefly state which revision class was detected and which slides are being

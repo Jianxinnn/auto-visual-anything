@@ -90,7 +90,7 @@ See `references/slide-roles.md` for the full taxonomy.
 ## State (per run)
 
 ```
-<task_cwd>/.visual-deck/<YYYYMMDD-HHMMSS>/
+<task_cwd>/.visual-anything/runs/deck/<YYYYMMDD-HHMMSS>/
 ├── outline.md             # the deck outline (yaml in md)
 ├── deck_content_brief.md  # content claims, unknowns, and provenance
 ├── last_run.json          # {style, size, count, render_mode, max_concurrency, slides[], outline, ts}

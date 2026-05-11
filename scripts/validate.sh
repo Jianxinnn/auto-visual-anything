@@ -31,6 +31,13 @@ for required in domain_mode slide_generation_specs visual_primitive image2 gpt-i
   fi
 done
 
+for required in ".visual-anything/runs/figure" ".visual-anything/runs/deck" ".visual-anything/runs/gen"; do
+  if ! rg -F -q "$required" "$repo_root/README.md" "$repo_root/contracts/run-state.md" "$repo_root/docs/architecture.md" "$skills_dir"; then
+    echo "unified runtime output contract is missing required path: $required" >&2
+    exit 1
+  fi
+done
+
 if rg -n 'source\s*→\s*outline|visual-plan.*outline drafting' "$skills_dir/visual-deck" "$repo_root/contracts/deck-outline.md" >/tmp/visual-anything-deck-contract-rg.out 2>/dev/null; then
   echo "visual-deck still contains the old direct source-to-outline contract:" >&2
   cat /tmp/visual-anything-deck-contract-rg.out >&2

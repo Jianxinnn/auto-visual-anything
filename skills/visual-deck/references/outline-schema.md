@@ -3,7 +3,7 @@
 The orchestrator reads / writes a deck outline at:
 
 ```
-<task_cwd>/.visual-deck/<run-id>/outline.md
+<task_cwd>/.visual-anything/runs/deck/<run-id>/outline.md
 ```
 
 The outline is YAML embedded in a markdown wrapper for readability. The orchestrator

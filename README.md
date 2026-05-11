@@ -43,6 +43,20 @@ This maps:
 Legacy aliases (`figforge`, `figforge-plan`, `figforge-gen`, `figforge-deck`)
 may also point to these same directories during migration.
 
+## Output Layout
+
+Runtime outputs share one ignored root:
+
+```text
+.visual-anything/runs/
+├── figure/<run-id>/   # visual-anything single-figure runs
+├── deck/<run-id>/     # visual-deck slide-image runs
+└── gen/<run-id>/      # direct visual-gen runs
+```
+
+Curated documentation images stay in `assets/` or `skills/<skill-name>/assets/`
+and can be committed intentionally.
+
 ## Validation
 
 Run:

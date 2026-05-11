@@ -3,13 +3,15 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 
-# Runtime outputs created by the installed skills.
+# Canonical runtime output root created by the installed skills.
 .visual-anything/
-.visual-deck/
-visual-gen/
-.figforge/
-.figforge-deck/
-figforge-gen/
+
+# Legacy runtime output roots kept ignored for compatibility with older runs.
+/.visual-deck/
+/visual-gen/
+/.figforge/
+/.figforge-deck/
+/figforge-gen/
 
 # Local migration backups created outside the suite repo are not source.
 .migration-backups/

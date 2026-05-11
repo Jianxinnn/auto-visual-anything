@@ -99,7 +99,7 @@
   <!-- State band -->
   <rect class="node-soft" x="174" y="676" width="1188" height="146" rx="14"/>
   <text class="band-title" x="214" y="718">Recoverable run state</text>
-  <text class="mono" x="214" y="748">.visual-anything/&lt;run-id&gt;/</text>
+  <text class="mono" x="214" y="748">.visual-anything/runs/figure/&lt;run-id&gt;/</text>
 
   <rect class="node" x="492" y="704" width="210" height="70" rx="8"/>
   <text class="mono" x="597" y="746" text-anchor="middle">prompt_package.md</text>

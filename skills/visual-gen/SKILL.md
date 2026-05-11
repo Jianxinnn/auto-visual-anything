@@ -59,7 +59,7 @@ allowed-tools: [Bash, Read]
 
 `task_cwd` = 用户当前打开的项目/工作区目录。**不是** skill 安装目录、脚本目录、`$CODEX_HOME`、`~/.codex/generated_images/`。
 
-默认输出目录 `<task_cwd>/visual-gen/`。用户指定其他目录时,相对路径按 `task_cwd` 解析。
+默认输出目录 `<task_cwd>/.visual-anything/runs/gen/<run-id>/`。用户指定其他目录时,相对路径按 `task_cwd` 解析。
 
 `--out-dir` 是本地保存参数,**不进入 API payload**。
 
@@ -94,7 +94,7 @@ zsh -lc 'source ~/.zshrc >/dev/null 2>&1 || true; cd "<task-cwd>" || exit 1; pyt
 文生图:
 
 ```bash
-zsh -lc 'source ~/.zshrc >/dev/null 2>&1 || true; cd "<task-cwd>" || exit 1; python_cmd=$(bash "<skill-dir>/scripts/choose_python.sh") || { echo "未找到可用 Python 3.11+"; exit 1; }; python_argv=(${=python_cmd}); "${python_argv[@]}" "<skill-dir>/scripts/visual_gen.py" --mode generate --prompt "..." --out-dir "<task-cwd>/visual-gen"'
+zsh -lc 'source ~/.zshrc >/dev/null 2>&1 || true; cd "<task-cwd>" || exit 1; python_cmd=$(bash "<skill-dir>/scripts/choose_python.sh") || { echo "未找到可用 Python 3.11+"; exit 1; }; python_argv=(${=python_cmd}); "${python_argv[@]}" "<skill-dir>/scripts/visual_gen.py" --mode generate --prompt "..."'
 ```
 
 改图:加 `--mode edit --image "..."`(可选 `--mask`)。

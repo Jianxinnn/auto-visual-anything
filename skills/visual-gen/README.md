@@ -10,7 +10,7 @@
 - 默认 Responses API SSE 流式,降低长任务被代理 524 的概率;不支持时回退非流式 Images API
 - 支持自动触发与 `/visual-gen ...` 手动调用
 - 优先读取 `visual-gen` 独立 API 配置;没有时回退 Codex / Claude Code 配置
-- 默认结果保存到 `<当前项目>/visual-gen/`,可用 `--out-dir` 指定
+- 默认结果保存到 `<当前项目>/.visual-anything/runs/gen/<run-id>/`,可用 `--out-dir` 指定
 
 ## 来源与改动
 
@@ -120,13 +120,13 @@ python3.12 scripts/visual_gen.py \
   --prompt "一张透明背景的猫咪头像" \
   --size 1024x1024 \
   --output-format png \
-  --out-dir "./visual-gen"
+  --out-dir "./.visual-anything/runs/gen/manual"
 ```
 
 排查旧接口时显式关闭流式:
 
 ```bash
-python3.12 scripts/visual_gen.py --mode generate --no-stream --prompt "..." --size 1024x1024 --out-dir "./visual-gen"
+python3.12 scripts/visual_gen.py --mode generate --no-stream --prompt "..." --size 1024x1024 --out-dir "./.visual-anything/runs/gen/manual"
 ```
 
 ## 注意事项

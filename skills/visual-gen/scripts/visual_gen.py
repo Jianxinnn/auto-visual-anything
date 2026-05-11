@@ -355,7 +355,8 @@ def resolve_output_dir(out_dir: str | None):
         if not output_dir.is_absolute():
             output_dir = Path.cwd() / output_dir
         return output_dir
-    return Path.cwd() / "visual-gen"
+    run_id = datetime.now().strftime("%Y%m%d-%H%M%S")
+    return Path.cwd() / ".visual-anything" / "runs" / "gen" / run_id
 
 
 def save_images(image_entries, output_format: str | None, output_dir: Path):

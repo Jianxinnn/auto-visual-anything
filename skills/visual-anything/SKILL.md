@@ -77,7 +77,7 @@ Hand the source material to the **visual-plan** skill. It produces a **visual-an
 Prompt Package** (with evidence ledger). Save the package to:
 
 ```
-<task_cwd>/.visual-anything/<run-id>/prompt_package.md
+<task_cwd>/.visual-anything/runs/figure/<run-id>/prompt_package.md
 ```
 
 Stop and ask the user before STEP 3 if the package contains:
@@ -103,7 +103,7 @@ Map the Prompt Package fields to visual-gen arguments:
 | `Recommended Generation Settings → Quality` | `--quality` |
 | `Recommended Generation Settings → Background` | `--background` |
 
-Out-dir defaults to `<task_cwd>/.visual-anything/<run-id>/`.
+Out-dir defaults to `<task_cwd>/.visual-anything/runs/figure/<run-id>/`.
 
 Hand off **through the visual-gen skill**, not by calling
 `visual-gen/scripts/visual_gen.py` directly. visual-gen owns:
@@ -118,7 +118,7 @@ Reimplementing any of those here breaks the credential boundary.
 After generation succeeds, save run metadata:
 
 ```
-<task_cwd>/.visual-anything/<run-id>/last_image.json
+<task_cwd>/.visual-anything/runs/figure/<run-id>/last_image.json
 ```
 
 with shape:
@@ -148,14 +148,14 @@ Most figure work needs at least one revision round. Classify the user's request:
 If you cannot tell which class the revision belongs to, ask the user one targeted
 question. Do not silently pick a route.
 
-Append every revision attempt to `<task_cwd>/.visual-anything/<run-id>/revisions.log`
+Append every revision attempt to `<task_cwd>/.visual-anything/runs/figure/<run-id>/revisions.log`
 so the session is recoverable across resumes.
 
 ---
 
 ## State
 
-Each run lives under `<task_cwd>/.visual-anything/<run-id>/`:
+Each run lives under `<task_cwd>/.visual-anything/runs/figure/<run-id>/`:
 
 ```
 prompt_package.md   ← visual-plan output (verbatim)
@@ -189,7 +189,7 @@ After STEP 3 succeeds:
 
 ```text
 图片已生成: <image path>
-基于规划包: <task_cwd>/.visual-anything/<run-id>/prompt_package.md
+基于规划包: <task_cwd>/.visual-anything/runs/figure/<run-id>/prompt_package.md
 关键参数: size=..., output_format=..., quality=..., palette=...
 ```
 

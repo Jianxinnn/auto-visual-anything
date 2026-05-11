@@ -43,7 +43,7 @@ If you are unsure, start with `visual-anything` — its triage step will route t
 
 ## Pipeline
 
-![Auto Visual Anything call flow](assets/visual-anything-call-flow.png)
+![Auto Visual Anything call flow](assets/visual-anything-call-flow.svg)
 
 ```
 input ──► [visual-anything] triage
@@ -65,7 +65,7 @@ input ──► [visual-anything] triage
 Each run is recorded under:
 
 ```
-.visual-anything/<YYYYMMDD-HHMMSS>/
+.visual-anything/runs/figure/<YYYYMMDD-HHMMSS>/
 ├── prompt_package.md     # visual-plan output, verbatim
 ├── last_image.json       # { path, params, ts, prompt_package }
 └── revisions.log         # one line per revision attempt

@@ -1,6 +1,6 @@
 # Generation Parameter Contract
 
-`figforge-gen` owns the authoritative generation parameters and API behavior.
+`visual-gen` owns the authoritative generation parameters and API behavior.
 
 Common handoff fields:
 
@@ -17,4 +17,4 @@ Common handoff fields:
 - `out_dir`
 
 API configuration, token handling, endpoint fallback, Python detection, and
-timeout calculation remain inside `skills/figforge-gen`.
+timeout calculation remain inside `skills/visual-gen`.

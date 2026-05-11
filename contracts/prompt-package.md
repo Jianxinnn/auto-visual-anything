@@ -1,6 +1,6 @@
 # Prompt Package Contract
 
-`figforge-plan` is the source of truth for prompt package content.
+`visual-plan` is the source of truth for prompt package content.
 
 Minimum expected sections for image handoff:
 
@@ -14,6 +14,6 @@ Minimum expected sections for image handoff:
 - Post-edit notes
 - Source discipline / evidence ledger
 
-`figforge` may map recommended generation settings into `figforge-gen` fields,
-but it must not fabricate missing evidence or bypass the `figforge-plan`
+`visual-anything` may map recommended generation settings into `visual-gen` fields,
+but it must not fabricate missing evidence or bypass the `visual-plan`
 truthfulness rules.

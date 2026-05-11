@@ -1,6 +1,6 @@
 # Deck Outline Contract
 
-`figforge-deck` owns the canonical deck outline shape. The outline is YAML in a
+`visual-deck` owns the canonical deck outline shape. The outline is YAML in a
 Markdown wrapper with these top-level keys:
 
 - `title`
@@ -21,5 +21,5 @@ Supported roles:
 - `content`
 - `closing`
 
-`figforge-deck` may derive an outline from a `figforge-plan` prompt package, but
+`visual-deck` may derive an outline from a `visual-plan` prompt package, but
 it must preserve the evidence/unknown distinction from the planning layer.

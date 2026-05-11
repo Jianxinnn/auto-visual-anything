@@ -9,6 +9,14 @@ fi
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 skill="$1"
 target_root="${2:-/public/home/jxtang/.agents/skills}"
+
+case "$skill" in
+  figforge) skill="visual-anything" ;;
+  figforge-plan) skill="visual-plan" ;;
+  figforge-gen) skill="visual-gen" ;;
+  figforge-deck) skill="visual-deck" ;;
+esac
+
 src="$repo_root/skills/$skill"
 dst="$target_root/$skill"
 

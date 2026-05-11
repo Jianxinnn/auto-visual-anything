@@ -4,6 +4,9 @@ __pycache__/
 .pytest_cache/
 
 # Runtime outputs created by the installed skills.
+.visual-anything/
+.visual-deck/
+visual-gen/
 .figforge/
 .figforge-deck/
 figforge-gen/

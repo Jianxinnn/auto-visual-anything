@@ -13,16 +13,16 @@ Source repositories:
 Target layout:
 
 ```text
-FigForge/
+auto-visual-anything/
   skills/
-    figforge/
-    figforge-plan/
-    figforge-gen/
-    figforge-deck/
+    visual-anything/
+    visual-plan/
+    visual-gen/
+    visual-deck/
 ```
 
 After import, `~/.agents/skills/<name>` should be a symlink to the matching
-`FigForge/skills/<name>` directory. Existing standalone directories should be
+`auto-visual-anything/skills/<name>` directory. Existing standalone directories should be
 moved to `~/.agents/skills/.migration-backups/` rather than deleted.
 
 The old GitHub repositories can remain as read-only compatibility pointers after

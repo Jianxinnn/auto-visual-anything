@@ -3,7 +3,7 @@
 Single-figure runs use:
 
 ```text
-<task_cwd>/.figforge/<run-id>/
+<task_cwd>/.visual-anything/<run-id>/
   prompt_package.md
   last_image.json
   revisions.log
@@ -12,7 +12,7 @@ Single-figure runs use:
 Slide-image deck runs use:
 
 ```text
-<task_cwd>/.figforge-deck/<run-id>/
+<task_cwd>/.visual-deck/<run-id>/
   outline.md
   last_run.json
   prompts/

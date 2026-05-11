@@ -1,35 +1,16 @@
 # Slide Generation Spec
 
-`visual-deck` is an image-generation orchestrator. The output is still one
-image2 / gpt-image-2 generated PNG per slide. This spec is the planning layer
-that prevents those generated images from becoming empty, generic, or visually
-chaotic.
+`visual-deck` uses one image2 / `gpt-image-2` PNG per slide. A generation spec makes each
+prompt concrete enough to avoid generic slide art.
 
-The spec is not a deterministic drawing format. It is a compact contract for
-compiling stronger per-slide image prompts.
+Pipeline:
 
----
-
-## Pipeline Position
-
-```
-deck_content_brief.md
-  -> outline.md
-  -> slide_generation_specs/slide-NN.md
-  -> prompts/slide-NN.md
-  -> render_slides.py
-  -> visual-gen / gpt-image-2
-  -> slides/slide-NN.png
+```text
+deck_content_brief.md -> outline.md -> slide_generation_specs/slide-NN.md
+-> prompts/slide-NN.md -> render_slides.py -> visual-gen -> slides/slide-NN.png
 ```
 
-`outline.md` says what the deck says. `slide_generation_specs/` says how image2
-should make the slide visually rich without inventing unsupported content.
-
----
-
-## Minimal Spec Shape
-
-Use Markdown for readability:
+## Shape
 
 ```markdown
 # Slide Generation Spec: slide-03
@@ -38,135 +19,68 @@ Use Markdown for readability:
 - domain_mode: sci-structural
 - title: 计算路线
 - captions:
-  - FOL/DHF双态
-  - DMS降风险
+  - FOL/DHF 双态
+  - DMS 降风险
 - visual_primitive: pipeline
 - image2_detail_level: high
 - text_policy: title_and_two_captions_only
 
 ## Claim
-Candidates are designed and screened across FOL/FA and DHF states before DMS risk filtering.
+[one source-supported claim]
 
 ## Evidence Anchors
-- LigandMPNN cross-state scoring
-- DMS source over 3078 single mutants
+- [...]
 
 ## Mechanism / Scene Grammar
-- Left: two ternary state cards, one FOL/FA target and one DHF anti-target.
-- Middle: LigandMPNN design pool, shown as varied candidate glyphs.
-- Right: cross-state scoring and DMS filter gate.
-- Use a solid navy path for accepted low-burden evidence.
-- Use a rust dashed branch for high-burden or uncertain candidates.
+- Left: [...]
+- Middle: [...]
+- Right: [...]
 
 ## Must Include Visually
-- target/anti-target state contrast
-- candidate compression/funnel
-- evidence gate
-- warning branch
+- [...]
 
 ## Must Avoid
-- fake numeric tables
-- tiny unreadable labels
-- stock lab bench
-- decorative DNA wallpaper
-- generic protein blob without state contrast
+- [...]
 
 ## Prompt Compile Notes
-- Keep Chinese title and captions large.
-- Put technical labels as large short Latin tokens only: FOL/FA, DHF, DMS.
-- Do not add file paths or extra numbers.
+- [...]
 ```
-
----
 
 ## Domain Modes
 
-Use `domain_mode` from `domain-tendencies.md`. The mode changes how prompts are
-compiled:
-
-- `sci-research`: image2 must show evidence structure, uncertainty, and mechanism.
-- `sci-structural`: image2 must show state contrast, residue/motif/state logic,
-  ligand or mutation semantics, not generic biology decoration.
-- `product-marketing`: image2 may use hero imagery, but product/object/workflow
-  must be visible in the first visual field.
-- `tech-product`: image2 should show architecture/workflow with clean technical
-  diagram primitives, not cinematic abstraction.
-- `business-report`: image2 should show operational structure, KPI/risk/roadmap
-  motifs, and restrained visual density.
-- `editorial-creative`: image2 can carry more mood and visual rhythm, but factual
-  claims remain constrained by the brief.
-
----
+- `sci-research`: evidence, uncertainty, mechanism
+- `sci-structural`: state contrast, residue/motif/ligand logic
+- `product-marketing`: visible product/object/workflow and value
+- `tech-product`: architecture/workflow, clean technical primitives
+- `business-report`: KPI/risk/roadmap motifs, restrained density
+- `editorial-creative`: stronger rhythm/mood, but claims remain constrained
 
 ## Visual Primitives
 
-The primitive is a prompt grammar, not a renderer instruction.
+SCI: `state_contrast`, `mechanism_panel`, `pipeline`, `evidence_stack`, `quant_figure`,
+`risk_map`, `decision_loop`.
 
-SCI-oriented:
+Product/business: `product_hero`, `workflow`, `architecture`, `comparison`,
+`metric_story`, `roadmap`, `risk_register`.
 
-- `state_contrast`: target vs anti-target, treatment vs control.
-- `mechanism_panel`: causal mechanism with sparse labeled regions.
-- `pipeline`: left-to-right workflow with distinct stages.
-- `evidence_stack`: multiple evidence layers leading to one bounded conclusion.
-- `quant_figure`: generated chart-like visual; exact numbers must be limited to
-  title/captions or large labels.
-- `risk_map`: two-axis conceptual map with large labeled regions.
-- `decision_loop`: next-round SOP or assay decision path.
+## Prompt Rules
 
-Product/business-oriented:
+Every compiled prompt includes role/sequence, `domain_mode`, title/captions,
+`visual_primitive`, scene grammar, must-include, must-avoid, truth constraints, and chosen
+style anchors.
 
-- `product_hero`: generated hero slide showing the product/object/category.
-- `workflow`: user, operational, or tool flow.
-- `architecture`: system/data/agent/tool routing.
-- `comparison`: alternatives and tradeoffs.
-- `metric_story`: KPI-like visual without asking image2 to render dense tables.
-- `roadmap`: phases and dependency gates.
-- `risk_register`: blocker/risk/mitigation motif.
+SCI slides: draw a mechanism, not only a topic; prefer 3-6 large elements; keep technical
+tokens short and large; show uncertainty as warning branch/dashed region/caution zone.
 
----
+Product/business slides: show the actual product, user action, workflow, architecture, or
+decision object. Do not render dense fake dashboards or generic SaaS icon grids.
 
-## Image2 Prompt Rules
+## QA
 
-Every compiled prompt must include:
-
-- role and sequence
-- domain_mode
-- title and captions
-- visual primitive
-- concrete scene grammar
-- must-include visual details
-- must-avoid list
-- truth constraints
-- style anchors from the chosen style file
-
-For SCI slides:
-
-- Tell image2 what mechanism to draw, not only what topic the slide covers.
-- Prefer 3-6 large visual elements over many tiny panels.
-- Use short Latin labels for technical tokens; keep Chinese text to the title
-  and at most two captions.
-- Any exact numeric evidence should be large, sparse, and already present in the
-  spec. Do not ask image2 to render dense DMS tables.
-- If uncertainty matters, represent it as warning branch, dashed region, or
-  caution zone.
-
-For product/business slides:
-
-- Show the product, user action, workflow, architecture, or decision object.
-- Avoid generic SaaS icon grids unless the source is actually a feature grid.
-- Metrics can be shown as simple bars/cards, but never dense fake dashboards.
-
----
-
-## QA Before Generation
-
-Before calling image2:
-
-- Does the slide have a visual primitive?
-- Does the prompt specify mechanism/scene grammar, not just a topic?
-- Are title and captions short enough for image2?
-- Are technical labels limited to large short tokens?
-- Is the uncertainty or warning logic visible when needed?
-- Does the prompt forbid common domain cliches?
-- For source-backed decks, can every claim be traced to `deck_content_brief.md`
-  or user-authored outline content?
+- visual primitive present
+- scene grammar is concrete
+- title/captions fit image text budget
+- exact labels are short, large tokens
+- uncertainty/warning visible when needed
+- domain cliches forbidden
+- source-backed claims trace to brief or user outline

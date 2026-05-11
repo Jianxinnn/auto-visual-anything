@@ -1,127 +1,69 @@
 ---
 name: visual-anything
-description: >
-  visual-anything: use when the user wants the full source-to-image pipeline — analyze a
-  paper / repo / algorithm / diagram / design idea, plan a publication-quality
-  figure, AND actually generate the image. Triggers: "做一张论文主图",
-  "把这个 repo 画成 figure", "出一张架构图直接生成", "scientific figure pipeline",
-  "make and generate a figure", or `/visual-anything`. Routes between visual-plan
-  (truthful prompt construction) and visual-gen (gpt-image-2 call), and manages
-  the iteration loop. Do NOT trigger if the user only wants the prompt (use
-  visual-plan directly) or already has a finished prompt and just needs pixels
-  (use visual-gen directly).
+description: Use when the user wants one source-grounded figure generated end to end from a paper, repo, algorithm, diagram, or design idea. Use for requests such as "make and generate a main figure", "把这个 repo 画成 figure", "出一张架构图直接生成", or `/visual-anything`. Do not use for prompt-only work or for rendering an already-final prompt.
 argument-hint: <自然语言需求 + 可选源材料>
 allowed-tools: [Bash, Read, Write, Edit]
 ---
 
-# visual-anything — Source → Plan → Image (orchestrator)
+# visual-anything
 
-The Auto Visual Anything suite has four skills. This one is the single-figure
-conductor; it does **not** duplicate sub-skill work. Use it when you want all
-three of:
+Single-figure orchestrator: triage → `visual-plan` → `visual-gen` → iteration.
+It must not analyze evidence or call image APIs directly.
 
-1. Truthful planning (delegated to **visual-plan**)
-2. Actual image generation (delegated to **visual-gen**)
-3. Coherent iteration across both layers
+## Triage
 
-If the user only needs a prompt, call `visual-plan` directly. If they already
-have a final prompt and only want pixels, call `visual-gen` directly. Skip
-this skill in those cases.
+| User intent | Route |
+|---|---|
+| Raw image prompt only | Call `visual-gen`; skip planning |
+| Source material + generated image | Full pipeline |
+| Source material + "prompt only" | Call `visual-plan`; stop before generation |
 
----
+Source material includes local paths, PDFs/images/SVGs, repo URLs, arXiv/GitHub links,
+code blocks longer than 5 lines, or structured algorithm prose. If route affects cost or
+truthfulness and remains unclear, ask one question.
 
-## Pipeline
+## Run State
 
-```
-INPUT
-  │
-  ▼
-[STEP 1] Triage ──► raw prompt only?  →  skip STEP 2, jump to STEP 3
-  │                 source material?   →  continue
-  ▼
-[STEP 2] Plan      (delegate to visual-plan)  →  visual-anything Prompt Package
-  │                                                + evidence ledger
-  ▼
-[STEP 3] Generate  (delegate to visual-gen)   →  image file on disk
-  │
-  ▼
-[STEP 4] Iterate   (route revisions back to STEP 2 or STEP 3)
+Use `<task_cwd>/.visual-anything/runs/figure/<YYYYMMDD-HHMMSS>/`:
+
+```text
+prompt_package.md
+last_image.json
+revisions.log
 ```
 
----
+A new top-level figure request creates a new run; revisions stay in the latest run unless
+the user asks to start over.
 
-## STEP 1 — Triage
+## Plan
 
-Decide whether the planning layer is needed.
+Delegate source analysis to `visual-plan` and save its prompt package verbatim as
+`prompt_package.md`.
 
-| Signal | Route |
-|--------|-------|
-| Raw prompt, no source material (e.g. `画一只透明背景的猫`) | Skip STEP 2; jump to STEP 3 with the prompt as-is |
-| Source material present (repo path, paper PDF, code snippet, algorithm description, diagram image) | Full pipeline: STEP 2 → STEP 3 |
-| Source material **and** the user explicitly says "just the prompt, don't generate" | STEP 2 only; do not call visual-gen |
+Stop before generation when `visual-plan` reports insufficient evidence, unresolved
+conflicts, or more than three critical `unknown` markers in claim/mechanism/metric fields.
+The truthfulness contract belongs to `visual-plan`; do not bypass it for a prettier image.
 
-Source-material detectors:
+## Generate
 
-- Local file path with extension `.py`, `.md`, `.pdf`, `.png`, `.svg`, or a directory
-- URL pointing to a paper / repo / arXiv ID / GitHub URL
-- Pasted code blocks longer than 5 lines
-- Long structured text describing an algorithm with named stages or `numbered steps`
+Pass the package to `visual-gen` through the skill interface, not by calling internal API
+logic. Field mapping:
 
-If still ambiguous after one pass, ask exactly one disambiguation question.
+| Prompt package field | `visual-gen` field |
+|---|---|
+| Core Image Prompt | `--prompt` |
+| Size | `--size` |
+| Output format | `--output-format` |
+| Quality | `--quality` |
+| Background | `--background` |
 
----
+Default `--out-dir` is the current figure run directory.
 
-## STEP 2 — Plan (delegate to visual-plan)
+`visual-gen` alone owns Python detection, API preflight, timeout rules, credential
+resolution, and image calls. If its preflight fails, surface the error and stop. Never
+read, copy, print, or substitute API tokens.
 
-Hand the source material to the **visual-plan** skill. It produces a **visual-anything
-Prompt Package** (with evidence ledger). Save the package to:
-
-```
-<task_cwd>/.visual-anything/runs/figure/<run-id>/prompt_package.md
-```
-
-Stop and ask the user before STEP 3 if the package contains:
-
-- More than 3 `unknown` markers in critical positions (claim, mechanism, primary metric)
-- An explicit "evidence insufficient" note from visual-plan
-- Conflicts that visual-plan flagged but did not resolve
-
-Generating an image from a thin evidence base produces hallucinated detail. The
-Truthfulness Contract lives in visual-plan and must not be bypassed here.
-
----
-
-## STEP 3 — Generate (delegate to visual-gen)
-
-Map the Prompt Package fields to visual-gen arguments:
-
-| Prompt Package field | visual-gen argument |
-|----------------------|-----------------------|
-| `Core Image Prompt` (compiled body) | `--prompt` |
-| `Recommended Generation Settings → Size` | `--size` |
-| `Recommended Generation Settings → Output format` | `--output-format` |
-| `Recommended Generation Settings → Quality` | `--quality` |
-| `Recommended Generation Settings → Background` | `--background` |
-
-Out-dir defaults to `<task_cwd>/.visual-anything/runs/figure/<run-id>/`.
-
-Hand off **through the visual-gen skill**, not by calling
-`visual-gen/scripts/visual_gen.py` directly. visual-gen owns:
-
-- API preflight (`--show-config`)
-- Python detection (`scripts/choose_python.sh`)
-- Timeout calculation per `references/fields.md`
-- Credential resolution per `references/api-config.md`
-
-Reimplementing any of those here breaks the credential boundary.
-
-After generation succeeds, save run metadata:
-
-```
-<task_cwd>/.visual-anything/runs/figure/<run-id>/last_image.json
-```
-
-with shape:
+After success, write `last_image.json`:
 
 ```json
 {
@@ -132,73 +74,26 @@ with shape:
 }
 ```
 
----
+## Iterate
 
-## STEP 4 — Iterate
+| Revision | Route |
+|---|---|
+| Cosmetic: contrast, brightness, size, quality | Reuse package; call `visual-gen` |
+| Pixel edit: local change to prior image | Call `visual-gen --mode edit` |
+| Text/style within existing content | Edit package, then call `visual-gen` |
+| Structural/evidence change | Return to `visual-plan` first |
 
-Most figure work needs at least one revision round. Classify the user's request:
+Append each attempt to `revisions.log`. If the revision class is ambiguous, ask one
+targeted question instead of guessing.
 
-| Revision type | Example | Route |
-|---------------|---------|-------|
-| Cosmetic | "brighter", "more contrast", "swap to landscape", "redo at higher quality" | Re-call visual-gen with adjusted parameters; reuse same Prompt Package |
-| Pixel-edit | "remove the watermark", "tweak this corner only" | Call visual-gen with `--mode edit` and the previous image path |
-| Content (label / palette / title text) | "change title to X", "use systems-blue palette" | Edit the Prompt Package body in place, then re-call visual-gen |
-| Structural | "the architecture is wrong", "missing a component", "wrong arrow direction" | Go back to STEP 2; the package itself needs editing first |
+## User Output
 
-If you cannot tell which class the revision belongs to, ask the user one targeted
-question. Do not silently pick a route.
-
-Append every revision attempt to `<task_cwd>/.visual-anything/runs/figure/<run-id>/revisions.log`
-so the session is recoverable across resumes.
-
----
-
-## State
-
-Each run lives under `<task_cwd>/.visual-anything/runs/figure/<run-id>/`:
-
-```
-prompt_package.md   ← visual-plan output (verbatim)
-last_image.json     ← {path, params, ts, prompt_package}
-revisions.log       ← one line per revision attempt
-```
-
-`<run-id>` = ISO timestamp `YYYYMMDD-HHMMSS`. A new top-level user request opens a
-new run; revisions stay inside the most recent run unless the user explicitly
-asks to start over.
-
----
-
-## Boundaries
-
-- Do NOT reimplement what the sub-skills do. No inline gpt-image-2 calls. No
-  inline evidence classification. Always invoke the sub-skill.
-- API credentials are owned by visual-gen alone. visual-anything never reads, copies,
-  prints, or transforms tokens. Never inject Codex- or Claude-side credentials
-  into `VISUAL_GEN_API_KEY`.
-- If visual-gen's `--show-config` preflight fails, surface the error verbatim
-  and STOP. Do not retry the image step with substituted credentials.
-- If the user asked only for a prompt, do not run STEP 3. The waste is real —
-  gpt-image-2 calls are slow and metered.
-
----
-
-## Output to user
-
-After STEP 3 succeeds:
+After generation:
 
 ```text
 图片已生成: <image path>
-基于规划包: <task_cwd>/.visual-anything/runs/figure/<run-id>/prompt_package.md
-关键参数: size=..., output_format=..., quality=..., palette=...
+基于规划包: <run-dir>/prompt_package.md
+关键参数: size=..., output_format=..., quality=...
 ```
 
-For revisions, briefly state which revision class was detected and which step is
-being re-run before doing it. Example:
-
-```text
-[识别为 Cosmetic 修订 → 重新调用 visual-gen,size 改为 3840x2160]
-```
-
-For STEP 2-only requests (prompt without generation), return the path to
-`prompt_package.md` and skip the image-related lines.
+For prompt-only requests, return the prompt package path/content and no image lines.

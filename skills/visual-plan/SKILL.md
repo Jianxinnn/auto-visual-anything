@@ -1,111 +1,65 @@
 ---
 name: visual-plan
-description: >
-  visual-plan: use when the user wants to turn a source artifact into a publication-quality
-  scientific figure plan, optimized image-generation prompt, or optional editable HTML/SVG
-  schematic. Trigger for "make a main figure", "generate a prompt for this paper/repo",
-  "visualize this system", "draw the architecture", "turn this into a diagram/poster",
-  "map this repo", "paper figure prompt", "论文主图 prompt", "绘图 prompt", or any request converting
-  a paper, GitHub repo, local codebase, diagram, algorithm, or system description into a
-  scientific figure prompt package. Do not trigger for ordinary code review, debugging, or
-  text-only architecture discussion unless the user asks for a visual/prompt output.
+description: Use when the user wants a publication-quality figure plan, image-generation prompt package, or editable HTML/SVG schematic from a paper, repo, diagram, algorithm, codebase, or design request. Do not use for ordinary code review, debugging, or text-only architecture discussion unless a visual/prompt artifact is requested.
 ---
 
-# visual-plan — Source → Scientific Figure
+# visual-plan
 
-Turn technical material (code, paper, diagram, algorithm, or design request) into a
-truthful, publication-quality figure spec. Default output: an image-generation prompt
-package. Optional output: a self-contained HTML/SVG artifact when the user asks for
-deterministic editable vector output.
+Source artifact → truthful figure spec. Default output is an image prompt package; HTML/SVG
+is only for explicit editable or deterministic-vector requests.
 
----
+## Route
 
-## STEP 1 — CLASSIFY INPUT
+Score all strong signals before choosing; if two or more types score, use `HYBRID`.
 
-Score every strong signal before routing. If two or more types score, route HYBRID;
-do not collapse mixed input to the first signal.
+| Type | Strong signals | Read |
+|---|---|---|
+| `CODE_REPO` | repo path, manifests, file tree, source syntax | `skills/repo_analyzer.md` |
+| `RESEARCH_PAPER` | PDF, abstract/method/results, DOI/arXiv, paper wording | `skills/paper_to_poster.md` |
+| `DIAGRAM_IMAGE` | uploaded image/SVG/screenshot with boxes/arrows/nodes | `skills/diagram_to_draft.md` |
+| `ALGO_TEXT` | numbered steps, pseudocode, process prose | `skills/algo_to_draft.md` |
+| `HYBRID` | at least two strong source types | `skills/hybrid.md` |
+| `DESIGN_REQUEST` | new design ask with no reference material | `skills/design_from_scratch.md` |
 
-| Type | Strong signals | Sub-skill |
-|------|----------------|-----------|
-| **CODE_REPO** | repo path, manifests (`package.json`, `pyproject.toml`, `Cargo.toml`...), file tree, source syntax (`import`, `class`, `def`) | `skills/repo_analyzer.md` |
-| **RESEARCH_PAPER** | PDF, abstract/method/results sections, "Figure 1", DOI/arXiv, "we propose / we evaluate" | `skills/paper_to_poster.md` |
-| **DIAGRAM_IMAGE** | image/SVG/screenshot with boxes, arrows, nodes, swimlanes | `skills/diagram_to_draft.md` |
-| **ALGO_TEXT** | numbered steps, pseudocode, stage-by-stage prose, no source-code syntax | `skills/algo_to_draft.md` |
-| **HYBRID** | ≥ 2 strong types above | `skills/hybrid.md` |
-| **DESIGN_REQUEST** | new design ask, no reference material | `skills/design_from_scratch.md` |
+If the main table is not enough, read `router/intent_parser.md`. If the user does not
+want a visual or prompt artifact, do not use this skill.
 
-If routing is ambiguous after scoring, see `router/intent_parser.md` for the full
-signal-scoring rules and ambiguous-case table. If the user does not want a visual
-or prompt artifact, do not use this skill.
+## Truth Contract
 
----
+Before compiling, read `style/evidence_discipline.md`. Every output must separate:
 
-## STEP 2 — TRUTHFULNESS CONTRACT
+- evidence directly observed in source material
+- assumptions made for visualization/design
+- unknowns or conflicts
 
-Every output distinguishes evidence from inference. **Read `style/evidence_discipline.md`
-before compiling.** It is the single source for the evidence ledger format, metric
-discipline, and the rationalization table.
+Never invent numbers, modules, baselines, citations, dependencies, or missing diagram
+parts. If unsupported, mark `unknown`, omit the panel, or label it as assumption.
 
-Quick self-check — STOP if you catch yourself thinking:
+## Output Target
 
-- "This number probably exists in the source."
-- "Marking unknown looks ugly; let me put a placeholder."
-- "User wants polish; rough estimates are fine."
-- "This dependency is so common it must be present."
-- "The diagram needs symmetry, so I'll add one more module."
+| Request | Renderer |
+|---|---|
+| prompt, GPT image, Midjourney, Stable Diffusion, "生图", unspecified | `renderers/image_prompt.md` |
+| editable HTML/SVG, deterministic labels, local vector artifact | `renderers/html_artifact.md` |
+| prompt plus generated image | Finish planning first, then read `router/image_handoff.md` |
 
-Each is a Contract violation. Mark `unknown`, omit the panel, or label as assumption.
-Full rationalization table in `style/evidence_discipline.md`.
+## Execution
 
----
+1. Read `style/visual_system.md` and `style/evidence_discipline.md`.
+2. If domain cues are strong, read `style/domain_hints.md` for favor/avoid guidance.
+3. Read the routed sub-skill and run its phases.
+4. Compile with the selected renderer last; never compile before analysis is complete.
+5. State briefly: `Routing as <TYPE> -> compiling <renderer>.`
 
-## STEP 3 — SELECT OUTPUT TARGET
+Ask at most one clarifying question, only when missing information changes the route or
+output target.
 
-```
-IF user asks for a prompt, image model, Midjourney, GPT image, Stable Diffusion,
-   "生图", "绘图 prompt"
-  → image_prompt   (default)
+For `image_prompt`, return the full prompt package in chat. For `html_artifact`, save a
+self-contained file in the current workspace when filesystem access exists, unless the
+user names a different path.
 
-ELSE IF user asks for editable HTML/SVG, deterministic labels, or a local artifact
-  → html_artifact
+## Local Environment
 
-ELSE
-  → image_prompt
-```
-
-If the user wants both the prompt **and** a directly generated image, see
-`router/image_handoff.md` for the two-stage handoff and credential boundary rules.
-
----
-
-## STEP 4 — EXECUTE
-
-1. Read `style/visual_system.md` (palette and diagram language) and
-   `style/evidence_discipline.md` (evidence rules). If the source has a strong domain
-   signal (paper venue, repo dependencies, diagram notation, algorithm field), also
-   read `style/domain_hints.md` for matching `Favor` primitives and `Avoid` items.
-2. Read the sub-skill from STEP 1.
-3. Run its phases; produce the structured content block.
-4. Read the chosen renderer:
-   - `renderers/image_prompt.md` (default)
-   - `renderers/html_artifact.md` (deterministic vector output)
-5. Compile the final output. The renderer is always the last step; never compile
-   before analysis is complete.
-
-State briefly to the user: *"Routing as [TYPE] → compiling [output_target]."*
-Ask at most one clarifying question, only if the missing detail would change the
-route or output type.
-
-For `image_prompt`, return the full prompt package in chat. For `html_artifact`,
-save the file in the current workspace if local filesystem access exists, unless
-the user requested a different destination.
-
----
-
-## Environment Notes
-
-**Chat**: use uploaded PDFs, images, text, or zip contents directly. Do not claim
-local filesystem access unless the tool environment provides it.
-
-**Local coding**: use fast file tools (`rg --files`, `rg`, package manifests) to scope
-the repo. Skip `node_modules`, `.git`, `dist`, build output, generated files.
+Use fast scoped inspection: `rg --files`, `rg`, manifests, entry points, and relevant
+source files. Skip `.git`, `node_modules`, build outputs, generated files, caches, and
+runtime output directories.

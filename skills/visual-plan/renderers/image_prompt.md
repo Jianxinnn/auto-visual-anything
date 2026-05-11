@@ -1,83 +1,51 @@
 # Renderer: Image Prompt Package
 
-**Purpose**: Convert the analyzed figure plan from any sub-skill into a polished,
-tool-agnostic image-generation prompt package for scientific figures.
+Default renderer for copy-ready image-generation prompts. Use unless the user explicitly
+asks for deterministic HTML/SVG.
 
-Use this renderer by default when the user wants a prompt, wants to use an external
-image-generation tool, or did not explicitly ask for deterministic HTML/SVG.
+## Input Contract
 
----
+A sub-skill provides:
 
-## Renderer Contract
-
-Input: A structured content block from any sub-skill, with:
-- `input_type`: code_repo / research_paper / diagram_image / algo_text / hybrid / design_request
-- `figure_goal`: main figure / architecture diagram / graphical abstract / poster / schematic
-- `evidence`: facts directly supported by the source
-- `assumptions`: visual or design assumptions
-- `unknowns`: important missing details
-- `nodes`, `edges`, `panels`, `labels`, `callouts`, and `visual_hierarchy`
-- `palette_profile` and `palette_rationale`
-
-Output: A copy-ready prompt package, not an image.
-
----
+- `input_type`, `figure_goal`
+- evidence, assumptions, unknowns
+- nodes, edges, panels, labels, callouts, hierarchy
+- palette profile and rationale
 
 ## Output Template
 
-Always return this exact structure:
+Return this structure:
 
 ```markdown
 # visual-plan Prompt Package
 
 ## 1. Figure Brief
-[1 short paragraph describing the scientific message and intended venue/style.]
+[short message, style, audience]
 
 ## 2. Core Image Prompt
-[The main prompt the user can paste into an image-generation tool.]
+[copy-ready prompt]
 
 ## 3. Layout Specification
-[Panel-by-panel spatial layout, reading order, main visual hierarchy, arrows, grouping.]
+[spatial layout, reading order, grouping, hierarchy]
 
 ## 4. Label Priority
 High-priority labels:
 - [...]
-
 Secondary labels:
 - [...]
-
-Avoid rendering as tiny text:
+Avoid tiny text:
 - [...]
 
 ## 5. Style Direction
-Palette profile:
-[sci-light / bio-evidence / systems-blue / data-violet / security-amber / product-muted / custom]
-
-Palette rationale:
-[Why this palette fits the project/source and what each color means.]
-
-Visual style:
-[Vector style, typography, line weight, icon rules, whitespace, what should feel premium.]
+Palette profile: [...]
+Palette rationale: [...]
+Visual style: [...]
 
 ## 6. Negative Prompt
-
-Compose the negative prompt as TWO blocks — universal first, domain-specific second.
-The full lists live in `style/domain_hints.md`; do not restate them here, copy from there.
-
-**Universal anti-cliché** (always include):
-- cartoon robots, anthropomorphic AI brains, "intelligence" glow halos
-- glowing sci-fi dashboards, neon HUDs, cyberpunk grids
-- generic cloud icons used as decoration
-- DNA double-helix as background filler
-- hooded hackers, matrix rain, lock-icon piles
-- fake LaTeX or garbled scientific symbols
-- 3D pie charts, decorative gauge dials
-- collage / scrapbook layouts, stock-photo overlays, lens flares
-
-**Domain anti-cliché** (pull from `style/domain_hints.md` row matching this figure's domain):
-- [merge the matched row's `Avoid` list here verbatim]
-- [if the source crosses domains, merge `Avoid` lists from all matching rows]
-- [if no domain row clearly fits, omit this block]
+Universal anti-cliche:
+- [from style/domain_hints.md]
+Domain anti-cliche:
+- [matched domain Avoid list, if any]
 
 ## 7. Recommended Generation Settings
 - Aspect ratio:
@@ -88,146 +56,54 @@ The full lists live in `style/domain_hints.md`; do not restate them here, copy f
 - Text strategy:
 
 ## 8. Post-Edit Notes
-[Precise labels, arrows, and source-specific details to add or correct in Figma/Illustrator/PPT/SVG.]
+[exact labels/arrows/source details to fix manually]
 
 ## 9. Source Discipline
 Evidence used:
 - [...]
-
 Assumptions:
 - [...]
-
 Unknowns:
 - [...]
 ```
 
----
+## Rules
 
-## Prompt Writing Rules
+- Evidence-bound numbers only. Unsupported stats become omitted, `unknown`, or qualitative.
+- Preserve actual source structure; do not convert mechanisms into generic "AI workflow".
+- Use 5-10 high-priority labels; dense paths, citations, and field names go to post-edit.
+- State the primary claim, dominant visual, supporting elements, and subordinate elements.
+- Choose a semantic palette from `style/visual_system.md`; explain color roles.
+- Put tool-specific flags in settings, not the core prompt, unless the user chose a tool.
 
-### Evidence-Bound Numbers
-
-Numbers in the core prompt are only allowed when they are explicitly supported by the
-analysis block. Do not invent counts such as files inspected, lines inspected, dependency
-counts, number of API modes, or confidence percentages. If the analyzed source does not
-provide a number, write `unknown`, omit the stat panel, or use a qualitative label such as
-`compact skill repo`.
-
-### Preserve Scientific Structure
-
-The prompt must encode the actual source structure:
-- Do not replace specific mechanisms with generic "AI workflow" language.
-- Keep source-derived node names, steps, and relationships where they matter.
-- If the source is a repo, reflect evidenced modules and data flow.
-- If the source is a paper, reflect the paper's contribution and mechanism.
-- If the source is a diagram, preserve or intentionally transform its visible structure.
-
-### Compress Labels for Image Models
-
-Image models often distort dense text. Split labels into tiers:
-
-- **High-priority labels**: 5-10 labels that must appear large and readable.
-- **Secondary labels**: labels that can appear as chips, headings, or short captions.
-- **Avoid tiny text**: long lists, exact citations, code paths, or dense field names.
-
-For exact publication labels, recommend post-editing. A strong image prompt should ask the
-model to reserve clean label spaces rather than forcing every small label into the raster.
-
-### Make the Visual Hierarchy Explicit
-
-Every prompt must state:
-1. The primary visual claim.
-2. The dominant visual element.
-3. The secondary supporting elements.
-4. What must look subordinate.
-
-Example:
-
-```
-The persistent research-state layer is the visual foundation and novelty; the closed-loop
-engine sits above it; tools and agents are smaller routed resources, not the main claim.
-```
-
-### Use Venue-Specific Style Carefully
-
-For scientific papers, prefer:
-- clean vector schematic
-- white or very light background
-- restrained blue/teal/green accents
-- amber/red only for warnings, blockers, or failed gates
-- thin gray strokes
-- professional sans-serif typography
-- minimal shadows
-- precise alignment
-
-Avoid:
-- cartoon robots
-- glowing sci-fi dashboards
-- random DNA backgrounds
-- generic cloud icons
-- decorative lab clipart
-- photorealistic wet-lab scenes unless requested
-- excessive gradients or 3D effects
-
-### Select Palette Semantically
-
-Choose a palette from `style/visual_system.md` based on the source domain and the figure's
-main claim. Do not default to black/cyan for every project. The palette table (sci-light,
-bio-evidence, systems-blue, data-violet, security-amber, product-muted) and full color
-roles live in `style/visual_system.md`; do not restate them here.
-
-Every prompt must specify color semantics in this exact shape:
+Color semantics should be explicit:
 
 ```text
-Use [palette] because [rationale tied to source domain or main claim].
-Use dark slate only for the single central orchestrator, if needed.
-Use light boxes for normal deterministic modules.
-Use [accent] for the main path.
-Use [novelty color] for the output/evidence/provenance claim.
+Use <palette> because <source/domain reason>.
+Use dark slate only for the central anchor if needed.
+Use light boxes for normal modules.
+Use <accent> for the main path.
+Use <novelty fill> for output/evidence/provenance.
 Use gray dashed outlines for optional/external elements.
-Use amber/coral only for warnings, failed gates, blockers, or negative evidence.
-Avoid large pure-black filled boxes.
+Use amber/coral only for warnings, blockers, or negative evidence.
 ```
 
-If the project's novelty is an output contract, evidence graph, provenance ledger, or
-auditable artifact, give that element a distinct pale semantic fill so the novelty is
-visible even when the core execution path is not selected.
+## Defaults
 
-### Tool-Agnostic Prompting
+| Figure type | Aspect | Size | Quality | Background |
+|---|---|---|---|---|
+| paper main figure | 16:9 or 3:2 | 1536x1024+ | high | white/opaque |
+| graphical abstract | 16:9 | 1536x1024 | high | white/opaque |
+| poster | 3:4 | 1024x1536 | high | white/opaque |
+| square preview | 1:1 | 1024x1024 | medium/high | white/opaque |
+| icon/sticker | 1:1 | 1024x1024 | medium | transparent |
 
-The core prompt should work in GPT image, Midjourney, Ideogram, or Stable Diffusion-like
-tools. Do not include tool-specific flags unless the user asks for a specific tool.
-Put aspect ratio and size in `Recommended Generation Settings`, not inside the core prompt,
-unless the target tool commonly expects it in the prompt.
+## QA
 
----
-
-## Recommended Settings Defaults
-
-Choose conservatively:
-
-| Figure Type | Aspect Ratio | Size | Quality | Background |
-|-------------|--------------|------|---------|------------|
-| Paper main figure | 16:9 or 3:2 | 1536x1024 or higher | high | white/opaque |
-| Graphical abstract | 16:9 | 1536x1024 | high | white/opaque |
-| Poster | 3:4 | 1024x1536 | high | white/opaque |
-| Square social preview | 1:1 | 1024x1024 | medium/high | white/opaque |
-| Icon/sticker | 1:1 | 1024x1024 | medium | transparent |
-
-If the user will manually call a service that struggles with high resolution, recommend
-generating at `1536x1024` first, then upscaling or redrawing labels manually.
-
----
-
-## Quality Checklist
-
-Before returning the prompt package, verify:
-
-- [ ] The core prompt has one clear scientific message.
-- [ ] The layout is spatially specific enough to guide generation.
-- [ ] The style direction names a palette profile and explains color semantics.
-- [ ] High-priority labels are few enough to be legible.
-- [ ] The negative prompt removes common scientific-figure failure modes.
-- [ ] Exact source facts are not mixed with assumptions.
-- [ ] Post-edit notes warn about text fidelity when the figure has many labels.
-- [ ] The style remains publication-quality, not decorative or generic.
+- one clear scientific message
+- spatially specific layout
+- palette profile and color semantics named
+- labels few enough to render
+- negative prompt includes universal and domain failure modes
+- facts, assumptions, and unknowns are not mixed
+- post-edit notes cover text fidelity risks

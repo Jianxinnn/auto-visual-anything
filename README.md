@@ -19,8 +19,9 @@ planning, image generation, and slide-image generation.
 | `visual-gen` | Image generation/editing through `gpt-image-2` compatible APIs | `skills/visual-gen/` |
 | `visual-deck` | Multi-slide PNG deck orchestrator | `skills/visual-deck/` |
 
-Each directory under `skills/` is intentionally self-contained. It can be copied
-or symlinked into an agent skills directory independently.
+Each `skills/<name>/` directory is an install unit. Runtime instructions and
+supporting files stay inside that directory; repo-root `docs/` and `contracts/`
+are maintainer references only.
 
 ## Local Development
 
@@ -54,8 +55,8 @@ Runtime outputs share one ignored root:
 └── gen/<run-id>/      # direct visual-gen runs
 ```
 
-Curated documentation images stay in `assets/` or `skills/<skill-name>/assets/`
-and can be committed intentionally.
+Curated repository documentation images stay in `assets/` and can be committed
+intentionally.
 
 ## Validation
 
@@ -65,6 +66,5 @@ Run:
 bash scripts/validate.sh
 ```
 
-The validator checks that each skill has a `SKILL.md`, that root-level runtime
-dependencies are not referenced from skill instructions, and that the
-`visual-gen` unit tests pass when `pytest` is available.
+The validator checks skill entry points, runtime dependency boundaries, deck
+contracts, Python syntax, and `visual-gen` tests when `pytest` is available.

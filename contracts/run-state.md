@@ -40,5 +40,5 @@ Direct visual-gen runs use:
 `render_mode: "parallel"` and `max_concurrency: 4`.
 
 Run-state directories are outputs. They should not be committed to the suite
-repository or copied into skill install units. Curated README or skill preview
-images remain in `assets/` or `skills/<skill-name>/assets/`.
+repository or copied into skill install units. Curated repository documentation
+images remain in repo-root `assets/`.

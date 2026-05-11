@@ -1,0 +1,80 @@
+{
+  "skill_name": "figforge-plan",
+  "project_name": "figforge-plan",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Analyze this local TypeScript repo and generate an optimized image-generation prompt package for a polished architecture main figure. Focus on entry points, services, external dependencies, and the main request flow.",
+      "expected_output": "A figforge-plan Prompt Package for a repo architecture figure, with source-backed structure, source paths, unknowns, label priority, negative prompt, and recommended generation settings.",
+      "files": [],
+      "assertions": [
+        "Uses CODE_REPO route, not ALGO_TEXT.",
+        "Reads repository manifests and entry points before compiling the prompt package.",
+        "Returns the exact figforge-plan Prompt Package sections.",
+        "Includes source paths or source discipline notes.",
+        "Marks unknown external systems instead of inventing them."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Turn this research paper into a Nature-style main figure prompt. Use the paper's own figures, results, and contribution claims; do not add metrics that are not in the paper.",
+      "expected_output": "A paper figure prompt package with figure brief, core image prompt, layout specification, label priority, style direction, negative prompt, source coverage, and citation/source notes.",
+      "files": [],
+      "assertions": [
+        "Uses RESEARCH_PAPER route.",
+        "Separates available source coverage from missing paper sections.",
+        "Does not fabricate author, venue, dataset, baseline, or metric values.",
+        "Uses figforge-plan scientific figure style.",
+        "Warns that dense exact labels may require post-editing."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Here is an architecture diagram image. Create a prompt that will redesign it to look more premium while preserving the same meaning and flow.",
+      "expected_output": "A diagram redesign prompt package that preserves visible semantics, labels unreadable image parts, and improves hierarchy, alignment, label priority, and visual emphasis.",
+      "files": [],
+      "assertions": [
+        "Uses DIAGRAM_IMAGE route with refine_existing mode.",
+        "Separates visible image evidence from inference.",
+        "Does not transpose to a new domain when the user asked for refinement.",
+        "Includes a negative prompt that prevents semantic drift."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Visualize this algorithm as a figure prompt: input documents are chunked, embedded, indexed, retrieved by query, reranked, and passed to a generator. Add a feedback loop for user ratings.",
+      "expected_output": "An algorithm figure prompt package showing inputs, stages, state/index, retrieval, reranking, generation, feedback loop, assumptions, unknowns, and exact label priorities.",
+      "files": [],
+      "assertions": [
+        "Uses ALGO_TEXT route.",
+        "Preserves the stated stages and feedback loop.",
+        "Labels assumptions separately from explicit facts.",
+        "Includes layout specification and label priority."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Use this paper and this repo to create one figure prompt explaining how the implementation matches the method. Call out mismatches.",
+      "expected_output": "A hybrid prompt package that treats the paper as intent and the code as implementation evidence, with source authority, conflicts, label priority, and post-edit notes.",
+      "files": [],
+      "assertions": [
+        "Uses HYBRID route because paper and code are both strong signals.",
+        "Marks insights with source labels such as FROM CODE and FROM PAPER.",
+        "Identifies conflicts or gaps instead of smoothing them over.",
+        "Includes source discipline and confidence notes."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Generate an editable self-contained HTML/SVG architecture figure for this algorithm, with deterministic labels and arrowheads.",
+      "expected_output": "An HTML/SVG artifact rather than a prompt package, because the user explicitly requested editable deterministic output.",
+      "files": [],
+      "assertions": [
+        "Selects html_artifact output target because HTML/SVG was requested.",
+        "Uses inline SVG with arrowheads.",
+        "Keeps exact labels deterministic.",
+        "Includes assumptions or source notes in the footer."
+      ]
+    }
+  ]
+}

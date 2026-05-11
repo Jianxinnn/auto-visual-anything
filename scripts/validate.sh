@@ -24,6 +24,13 @@ for required in deck_content_brief.md source_refs content_mode render_slides.py 
   fi
 done
 
+for required in domain_mode slide_generation_specs visual_primitive image2 gpt-image-2; do
+  if ! rg -q "$required" "$skills_dir/visual-deck"; then
+    echo "visual-deck image2-first contract is missing required term: $required" >&2
+    exit 1
+  fi
+done
+
 if rg -n 'source\s*→\s*outline|visual-plan.*outline drafting' "$skills_dir/visual-deck" "$repo_root/contracts/deck-outline.md" >/tmp/visual-anything-deck-contract-rg.out 2>/dev/null; then
   echo "visual-deck still contains the old direct source-to-outline contract:" >&2
   cat /tmp/visual-anything-deck-contract-rg.out >&2

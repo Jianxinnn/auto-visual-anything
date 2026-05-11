@@ -1,8 +1,15 @@
 # Slide roles
 
-Every slide in `visual-deck` has exactly **one** role. The role + the chosen style
-template uniquely determine the layout. The orchestrator does NOT have free choice over
-layout — it picks the role from the outline, then defers to the style file.
+Every slide in `visual-deck` has exactly **one** narrative role. The role says where the
+slide sits in the deck story. The generation spec's `visual_primitive` says what image2
+should draw for that slide.
+
+Examples:
+
+- `role: content` + `visual_primitive: pipeline`
+- `role: content` + `visual_primitive: risk_map`
+- `role: content` + `visual_primitive: mechanism_panel`
+- `role: cover` + `visual_primitive: product_hero`
 
 This taxonomy exists because image-gen (B mode) breaks down once a slide tries to carry
 many distinct things. Four roles guarantee each slide has ONE typographic protagonist

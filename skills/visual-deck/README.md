@@ -2,7 +2,7 @@
 
 > The visual-anything family extension for **slide-image series**.
 > Produces N PNG images, each styled like a single PPT slide.
-> Title + ≤2 short captions are baked into each image.
+> Uses image2 / gpt-image-2 directly, with per-slide generation specs to avoid empty or generic slides.
 > No `.pptx`. No HTML container. Just images.
 
 ## Family map
@@ -29,6 +29,9 @@ input ──► [visual-deck] triage  (pick style, length, size)
                   [visual-deck] outline: slide list + provenance
                               │
                               ▼
+                  [visual-deck] generation spec: primitive + scene grammar
+                              │
+                              ▼
                   [visual-deck] render: per slide compile prompt
                               │
                               ▼  (4 parallel visual-gen calls by default)
@@ -53,6 +56,24 @@ Every style fixes the same **5 anchors**: color palette, typography, layout grid
 motif, background — so all slides in one deck stay visually consistent across the N image
 generations.
 
+## Domain modes and generation specs
+
+Before rendering, `visual-deck` chooses a `domain_mode` from
+`references/domain-tendencies.md` and writes one
+`slide_generation_specs/slide-NN.md` per slide. These specs are image2 prompt
+contracts, not local drawing instructions.
+
+They define:
+
+- visual primitive (`pipeline`, `risk_map`, `workflow`, `product_hero`, etc.)
+- evidence anchors
+- mechanism / scene grammar
+- must-include visual details
+- must-avoid list
+- prompt compile notes
+
+See `references/slide-generation-spec.md`.
+
 ## Slide roles
 
 Every slide has exactly one of four roles. Role + style uniquely determines the layout.
@@ -73,6 +94,7 @@ See `references/slide-roles.md` for the full taxonomy.
 ├── outline.md             # the deck outline (yaml in md)
 ├── deck_content_brief.md  # content claims, unknowns, and provenance
 ├── last_run.json          # {style, size, count, render_mode, max_concurrency, slides[], outline, ts}
+├── slide_generation_specs/slide-NN.md
 ├── prompts/slide-NN.md    # compiled per-slide prompt (style preamble + slide block)
 ├── slides/slide-NN.png    # the rendered slide images
 └── revisions.log          # one line per render / revision attempt
@@ -85,7 +107,7 @@ visual-deck/
 ├── SKILL.md                          # orchestration rules (triage / outline / render / iterate)
 ├── README.md                         # this file
 ├── scripts/
-│   └── render_slides.py              # parallel renderer; delegates each slide to visual-gen
+│   └── render_slides.py              # parallel runner; delegates each slide to visual-gen
 ├── styles/
 │   ├── _shared.md                    # universal hard constraints (B-mode budget, anti-AI tells)
 │   ├── academic-discussion.md
@@ -95,14 +117,16 @@ visual-deck/
 │   ├── tech-product.md
 │   └── editorial-creative.md
 └── references/
+    ├── domain-tendencies.md
+    ├── slide-generation-spec.md
     ├── slide-roles.md
     └── outline-schema.md
 ```
 
-No credentials and no new dependencies. Image generation still routes through `visual-gen`;
+No credentials and no new dependencies. Image generation routes through `visual-gen`;
 `scripts/render_slides.py` only schedules the per-slide calls in parallel, defaulting to
 `--jobs 4`. `visual-plan` is used only as a source-grounded evidence helper when source
-material exists. `visual-deck` owns the deck content brief and outline.
+material exists. `visual-deck` owns the deck content brief, outline, and generation specs.
 
 ## Why a separate skill
 
@@ -120,6 +144,8 @@ material exists. `visual-deck` owns the deck content brief and outline.
 - It does not bake long paragraphs / data tables / code blocks into images — gpt-image-2's
   text rendering breaks down beyond a short title plus 1–2 captions. The B-mode budget is
   intentional.
+- It does not replace image2 generation with a local PPT/chart renderer. If a slide is bad,
+  improve the generation spec and prompt, then regenerate.
 - It does not turn a single-figure prompt package directly into slides. Source material
   first becomes a `deck_content_brief.md`, then an outline.
 - It does not present topic-only decks as factual reports. Topic-only output is a concept

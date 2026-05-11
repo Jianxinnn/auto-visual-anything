@@ -21,6 +21,9 @@ title: "Deck Title"                  # ≤ 10 EN words / ≤ 8 CN chars
 style: academic-discussion           # one of styles/*.md filenames (without .md)
 size: 1536x1024                      # one of visual-gen's supported sizes
 content_mode: source                 # source | outline | topic
+domain_mode: sci-research            # see references/domain-tendencies.md
+generation_spec_refs:
+  - slide_generation_specs/slide-01.md
 slides:
   - role: cover
     title: "Deck Title"
@@ -38,6 +41,7 @@ slides:
     captions:
       - "short caption A"
       - "short caption B"
+    visual_primitive: pipeline
     source_refs:
       - "paper:results"
   - role: content
@@ -57,12 +61,16 @@ slides:
 
 The outline above is the canonical shape. Note these structural conventions:
 
-- The outer YAML keys are exactly: `title`, `style`, `size`, `content_mode`, `slides`
+- The outer YAML keys are: `title`, `style`, `size`, `content_mode`, optional
+  `domain_mode`, optional `generation_spec_refs`, and `slides`
 - `content_mode` is one of `source`, `outline`, or `topic`
-- `slides` is a list; each element has exactly: `role`, `title`, `captions`, `source_refs`
+- `slides` is a list; each element has `role`, `title`, `captions`, `source_refs`, and
+  optional `visual_primitive`
 - `captions` is always a list (possibly empty), never a single string
 - `source_refs` is always a list (possibly empty). It is provenance metadata and must not
   be rendered into the slide image.
+- `generation_spec_refs` points to per-slide generation specs used to compile rich image2
+  prompts.
 
 ---
 

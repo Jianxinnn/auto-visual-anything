@@ -5,12 +5,6 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 target_root="${1:-/public/home/jxtang/.agents/skills}"
 backup_root="$target_root/.migration-backups/$(date +%Y%m%d-%H%M%S)"
 skills=(visual-anything visual-plan visual-gen visual-deck)
-aliases=(
-  "figforge:visual-anything"
-  "figforge-plan:visual-plan"
-  "figforge-gen:visual-gen"
-  "figforge-deck:visual-deck"
-)
 
 mkdir -p "$target_root"
 
@@ -39,12 +33,6 @@ link_entry() {
 
 for skill in "${skills[@]}"; do
   link_entry "$skill" "$skill"
-done
-
-for alias_pair in "${aliases[@]}"; do
-  alias_name="${alias_pair%%:*}"
-  target_skill="${alias_pair##*:}"
-  link_entry "$alias_name" "$target_skill"
 done
 
 echo "Linked Auto Visual Anything skills into $target_root"

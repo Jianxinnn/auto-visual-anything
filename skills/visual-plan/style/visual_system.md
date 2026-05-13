@@ -53,6 +53,13 @@ Edges: neutral solid for normal flow, accent solid for the highlighted path, acc
 for feedback, gray dashed for conditional, coral/red for error. Route arrows cleanly and
 use one highlighted path unless the source truly has multiple modes.
 
+Connector discipline: every line or arrow must encode a specific relationship: data flow,
+causal transformation, hierarchy, feedback, comparison, or a local zoom/callout. Do not
+draw connector lines to fill space, decorate, imply vague association, or make the layout
+feel connected. If a relationship can be shown by alignment, grouping, proximity, shared
+color, or labels, prefer those over an extra line. Cross-panel connectors are allowed only
+for the main reading path or essential feedback loop.
+
 ## Charts
 
 Prefer horizontal/vertical bars, lines, grouped bars, small multiples, then scatter. Use
@@ -65,6 +72,11 @@ direct labels, no decorative gridlines, no 3D, max 3-4 colors, and only sourced 
 - Header: title/subtitle left; question/answer right when useful.
 - Whitespace should clarify hierarchy; if dense, make the page taller instead of shrinking
   text below legibility.
+- Scientific main figures must define major zones before details: focal mechanism,
+  supporting algorithm/evidence, optional insets, and footer. Zones may have unequal sizes,
+  but they must align to visible grid anchors and balanced visual weight.
+- Avoid free-floating lower panels, diagonal leader lines across unused space, and large
+  lanes that contain only a few small blocks.
 
 ## Icons
 
@@ -77,6 +89,7 @@ Before delivery, confirm:
 
 - one clear focal point
 - no overlap/clipping/unreadable text
+- no meaningless connector lines, decorative arrows, or vague associations
 - every number is sourced or marked assumption/unknown
 - footer states sources/confidence/assumptions
 - palette and hierarchy still work in grayscale

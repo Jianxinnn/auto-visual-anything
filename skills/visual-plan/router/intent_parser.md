@@ -14,8 +14,19 @@ else ask one concise question or skip this skill
 ```
 
 `visual-plan` triggers only when the user wants a visual artifact, figure plan, or prompt.
+If a strong figure-purpose signal appears, route by purpose before source type.
 
 ## Signals
+
+### SCIENTIFIC_MAIN_FIGURE
+
+Strong: "Figure 1", "main figure", Nature/Science/Cell/SCI style, "机制图",
+"机制路线", "算法框架图", "algorithm framework", "graphical abstract", or a request
+to summarize full material into a paper-ready mechanism/algorithm figure prompt.
+
+Moderate: asks for concept mechanism plus implementation detail, first-glance/close-reading
+layers, publication figure, domain-specific scientific visual elements, or AI drawing
+prompt for a manuscript figure.
 
 ### CODE_REPO
 
@@ -56,7 +67,8 @@ Moderate: constraints such as scale, latency, cost, reliability, model type, dep
 ## Ambiguous Cases
 
 - implementation prose without code syntax -> `ALGO_TEXT`
-- paper + code/repo -> `HYBRID`
+- Figure 1/main figure + paper/code/repo/algo -> `SCIENTIFIC_MAIN_FIGURE`
+- paper + code/repo without main-figure intent -> `HYBRID`
 - screenshot of paper figure -> `DIAGRAM_IMAGE` for visual transformation,
   `RESEARCH_PAPER` for whole-paper poster
 - image + explanatory text -> `HYBRID` when both affect output

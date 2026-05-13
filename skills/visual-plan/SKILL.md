@@ -10,10 +10,15 @@ is only for explicit editable or deterministic-vector requests.
 
 ## Route
 
-Score all strong signals before choosing; if two or more types score, use `HYBRID`.
+First score the user's figure intent. If the user asks for a paper main figure,
+Nature/Science/Cell-style mechanism figure, graphical abstract, SCI mechanism route, or
+algorithm framework figure, route to `SCIENTIFIC_MAIN_FIGURE` before source-type routing.
+
+Then score all strong source signals; if two or more source types score, use `HYBRID`.
 
 | Type | Strong signals | Read |
 |---|---|---|
+| `SCIENTIFIC_MAIN_FIGURE` | Figure 1/main figure, Nature/Science/Cell/SCI style, mechanism route, algorithm framework, graphical abstract | `skills/scientific_main_figure.md` |
 | `CODE_REPO` | repo path, manifests, file tree, source syntax | `skills/repo_analyzer.md` |
 | `RESEARCH_PAPER` | PDF, abstract/method/results, DOI/arXiv, paper wording | `skills/paper_to_poster.md` |
 | `DIAGRAM_IMAGE` | uploaded image/SVG/screenshot with boxes/arrows/nodes | `skills/diagram_to_draft.md` |
